@@ -6,15 +6,15 @@
 def jobIfEffect(JWINFO,JOB_OFFER):
 	
 	#数据不完整,缺失数据
-	if 'Job_effect' not in JOB_OFFER:
+	if 'JobType' not in JOB_OFFER:
 		return 0
 	if 'Res_SN' not in JWINFO:
 		return 0
 
-	#有效期 先当做全在有效期
-	if JOB_OFFER['Job_effect']==0:
-		pass
-		#return 0
+	#数据库未设有效期
+	# if JOB_OFFER['Job_effect']==0:
+	# 	pass
+	# 	#return 0
 
 	#职位类型
 	if  JOB_OFFER['JobType']!=JWINFO['Res_JobType1'] and\

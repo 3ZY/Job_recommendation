@@ -20,12 +20,12 @@ def CalculateAge(Birthday):
 			return Today.year-Birthday.year-1
 
 #计算职位是否在有效期内,数据库中没有效期设定,这里设置成30天?
-def CalculateJobIfEffect(Job_Publish_Date):
-	Today=datetime.datetime.today()
-	days=(Today-Job_Publish_Date).days
-	if days>30:
-		return 0
-	return 1
+# def CalculateJobIfEffect(Job_Publish_Date):
+# 	Today=datetime.datetime.today()
+# 	days=(Today-Job_Publish_Date).days
+# 	if days>30:
+# 		return 0
+# 	return 1
 
 #获取训练数据
 def getTrainData():
@@ -35,7 +35,10 @@ def getTrainData():
 	# sql="SELECT [Jw_SN]\
 	# 		,[Job_SN]\
 	# 	FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
-	# 	where VDate between '2016-04-20 00:00:00' and '2016-04-21 00:00:00'"
+	# 	WHERE VDate between '2014-04-01' and '2014-05-01'\
+	# 	and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
+	#	[Job_Publish_Date] between '2014-04-01' and '2014-05-01')"
+	
 
 	# result=DBQuery(sql)
 	# for data in result:
@@ -47,7 +50,9 @@ def getTrainData():
 	sql="SELECT [Jw_SN]\
 			,[Job_SN]\
 		FROM [AnalysisData].[dbo].[JOB_FAV]\
-		WHERE Add_Date between '2014-04-01 00:00:00' and '2014-04-02 00:00:00'"
+		WHERE Add_Date between '2014-04-01' and '2014-05-01' \
+		and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
+		[Job_Publish_Date] between '2014-04-01' and '2014-05-01')"
 
 	result=DBQuery(sql)
 	for data in result:
@@ -59,8 +64,10 @@ def getTrainData():
 	sql="SELECT [Jw_SN]\
 			,[Job_SN]\
 		FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
-		WHERE Apply_Date between '2014-04-01 00:00:00' and '2014-04-02 00:00:00'"
-
+		WHERE Apply_Date between '2014-04-01' and '2014-05-01' \
+		and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
+		[Job_Publish_Date] between '2014-04-01' and '2014-05-01')"
+	
 	result=DBQuery(sql)
 	for data in result:
 		if data[0] not in train:
@@ -149,7 +156,7 @@ def getJOB_OFFER(Job_SN):
 	if result==[]:
 		return JOB_OFFER
 	for data in result:
-		JOB_OFFER['Job_effect']=CalculateJobIfEffect(data[0])
+		# JOB_OFFER['Job_effect']=CalculateJobIfEffect(data[0])
 		JOB_OFFER['JobType']=data[1]
 		JOB_OFFER['Job_Money']=data[2]
 		JOB_OFFER['Job_Learn_Limited']=data[3]
