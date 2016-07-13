@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 #过滤器
 
+
 #职位是否有效
 def jobIfEffect(JWINFO,JOB_OFFER):
 	
@@ -52,8 +53,14 @@ def jobIfEffect(JWINFO,JOB_OFFER):
 	if JOB_OFFER['Job_Expr_Years']>JWINFO['Res_Expr_Years']:
 		return 0
 
-	#工作城市 数据库代码不清楚，目前不能判断
-	if JOB_OFFER['Job_Workplace_Code']==0:
-		pass
+	#工作城市
+	if ((JOB_OFFER['Job_Workplace_Code']/100==JWINFO['Res_Workcity1']/100 or \
+		JOB_OFFER['Job_Workplace_Code']/100==JWINFO['Res_Workcity2']/100 or \
+		JOB_OFFER['Job_Workplace_Code']/100==JWINFO['Res_Workcity3']/100 ) or \
+		( JWINFO['Res_Workcity1']==0 and JWINFO['Res_Workcity2']==0 and JWINFO['Res_Workcity3']==0 ) or \
+		((JOB_OFFER['Job_Workplace_Code']%10000==0 or JWINFO['Res_Workcity1']%10000==0) and (JOB_OFFER['Job_Workplace_Code']/10000==JWINFO['Res_Workcity1']/10000) ) or \
+		((JOB_OFFER['Job_Workplace_Code']%10000==0 or JWINFO['Res_Workcity2']%10000==0) and (JOB_OFFER['Job_Workplace_Code']/10000==JWINFO['Res_Workcity2']/10000) ) or \
+		((JOB_OFFER['Job_Workplace_Code']%10000==0 or JWINFO['Res_Workcity3']%10000==0) and (JOB_OFFER['Job_Workplace_Code']/10000==JWINFO['Res_Workcity3']/10000) ) )==0:
+		return 0
 
 	return 1

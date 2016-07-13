@@ -5,82 +5,13 @@ from __future__ import division
 from DB import *
 from filTer import *
 from getData import *
-import time
 import math
 import operator
 
-#获得时间段
-def getTimes():
-	#2月最后一天当28号
-	month={1:31,2:28,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31}
-	localtime=time.localtime()
-	nowtime=str(localtime[0])+'-'+str(localtime[1])+'-'+str(localtime[2])
-	if localtime[1]-1==0:
-		lastmonth=str(localtime[0]-1)+"-12-"+str(localtime[2])
-	else :
-		if localtime[2]>month[localtime[1]-1]:
-			lastmonth=str(localtime[0])+'-'+str(localtime[1]-1)+'-'+str(month[localtime[1]-1])
-		else:
-			lastmonth=str(localtime[0])+'-'+str(localtime[1]-1)+'-'+str(localtime[2])
-	return nowtime,lastmonth
-
-#获得所有Jw_SN
-def getAllJw_SN():
-	sql="SELECT [Jw_SN]\
- 	 FROM [AnalysisData].[dbo].[JWINFO]"
- 	result=DBQuery(sql)
- 	Jw_SN=list()
- 	for data in result:
- 		Jw_SN.append(data[0])
- 	return Jw_SN
-
-#获得最新一个月内所有职位
-def getAllJob_SN(nowtime,lastmonth):
-	
-	#sql="SELECT distinct Job_SN from [AnalysisData].[dbo].[JOB_OFFER] where Job_Publish_Date between "+lastmonth+" and "+nowtime
-
-	sql="SELECT distinct Job_SN from [AnalysisData].[dbo].[JOB_OFFER] where Job_Publish_Date between '2014-4-01' and '2014-4-30'"
-	allJob_SN=list()
-	result=DBQuery(sql)
-	for data in result:
-		allJob_SN.append(data[0])
-
-	return allJob_SN
 
 #获得最新一个月内行为数不为0的N(i)，N(i)是对职位i发生过行为的用户数
 def getNi(nowtime,lastmonth):
 	
-	# sql得出N(i)
-	# sql="SELECT count(distinct [Jw_SN]) as num\
-	# 			,[Job_SN]\
-	# 	from \
-	# 	(\
-	# 	select [Jw_SN]\
-	# 	      ,a.[Job_SN]\
-	# 	from \
-	# 	(\
-	# 	SELECT [Jw_SN]\
-	# 	      ,[Job_SN]\
-	# 	  FROM [AnalysisData].[dbo].[JOB_FAV]\
-	# 	union all\
-	# 	SELECT [Jw_SN]\
-	# 	      ,[Job_SN]\
-	# 	  FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
-	# 	union all\
-	# 	SELECT [Jw_SN]\
-	# 	      ,[Job_SN]\
-	# 	  FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
-	# 	) a \
-	# 	join \
-	# 	(\
-	# 	SELECT [Job_SN]\
-	# 	      ,[Job_Publish_Date]\
-	# 	  FROM [AnalysisData].[dbo].[JOB_OFFER]\
-	# 	  where Job_Publish_Date between "+lastmonth+" and "+nowtime+" \
-	# 	)b on b.[Job_SN]=a.Job_SN\
-	# 	) tmp\
-	# 	group by [Job_SN]"
-
 	# sql得出N(i)
 	sql="SELECT count(distinct [Jw_SN]) as num\
 				,[Job_SN]\
@@ -107,10 +38,11 @@ def getNi(nowtime,lastmonth):
 		SELECT [Job_SN]\
 		      ,[Job_Publish_Date]\
 		  FROM [AnalysisData].[dbo].[JOB_OFFER]\
-		  where Job_Publish_Date between '2014-4-01' and '2014-4-30'\
+		  where Job_Publish_Date between '%s' and '%s' \
 		)b on b.[Job_SN]=a.Job_SN\
 		) tmp\
-		group by [Job_SN]"
+		group by [Job_SN]" \
+		% (lastmonth,nowtime)
 
 	result=DBQuery(sql)
 	Ni=dict()
@@ -126,49 +58,6 @@ def city_type_most_popular_Recommend(u,Ni,nowtime,lastmonth):
 		return Recommend
 
 	# sql得出n(i)&u(f)
-	# sql="SELECT count(distinct [Jw_SN]) as num\
-	# 			,[Job_SN]\
-	# 	from \
-	# 	(\
-	# 	select [Jw_SN]\
-	# 	      ,a.[Job_SN]\
-	# 	from \
-	# 	(\
-	# 	SELECT [Jw_SN]\
-	# 	      ,[Job_SN]\
-	# 	  FROM [AnalysisData].[dbo].[JOB_FAV]\
-	# 	union all\
-	# 	SELECT [Jw_SN]\
-	# 	      ,[Job_SN]\
-	# 	  FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
-	# 	union all\
-	# 	SELECT [Jw_SN]\
-	# 	      ,[Job_SN]\
-	# 	  FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
-	# 	) a \
-	# 	join \
-	# 	(\
-	# 	SELECT [Job_SN]\
-	# 	      ,[Job_Publish_Date]\
-	# 	  FROM [AnalysisData].[dbo].[JOB_OFFER]\
-	# 	  where Job_Publish_Date between "+lastmonth+" and "+nowtime+" and \
-	# 			 ((Job_Workplace_Code="+str(JWINFO['Res_Workcity1'])+" or \
-	# 			 Job_Workplace_Code="+str(JWINFO['Res_Workcity2'])+" or \
-	# 			 Job_Workplace_Code="+str(JWINFO['Res_Workcity3'])+" ) or \
-	# 			 ("+str(JWINFO['Res_Workcity1'])+"=0 and \
-	# 			 	"+str(JWINFO['Res_Workcity2'])+"=0 and \
-	# 			 	"+str(JWINFO['Res_Workcity2'])+"=0 ) ) and \
-	# 			 ( (JobType="+str(JWINFO['Res_JobType1'])+" or \
-	# 			 	JobType="+str(JWINFO['Res_JobType2'])+" or \
-	# 			 	JobType="+str(JWINFO['Res_JobType3'])+" ) or \
-	# 			 	("+str(JWINFO['Res_JobType1'])+"=0 and \
-	# 			 	 "+str(JWINFO['Res_JobType2'])+"=0 and \
-	# 			 	 "+str(JWINFO['Res_JobType3'])+"=0) )\
-	# 	)b on b.[Job_SN]=a.Job_SN\
-	# 	) tmp\
-	# 	group by [Job_SN]"
-
-	# sql得出n(i)&u(f)
 	sql="SELECT count(distinct [Jw_SN]) as num\
 				,[Job_SN]\
 		from \
@@ -194,22 +83,32 @@ def city_type_most_popular_Recommend(u,Ni,nowtime,lastmonth):
 		SELECT [Job_SN]\
 		      ,[Job_Publish_Date]\
 		  FROM [AnalysisData].[dbo].[JOB_OFFER]\
-		  where Job_Publish_Date between '2014-4-01' and '2014-4-30' and \
-				 ((Job_Workplace_Code="+str(JWINFO['Res_Workcity1'])+" or \
-				 Job_Workplace_Code="+str(JWINFO['Res_Workcity2'])+" or \
-				 Job_Workplace_Code="+str(JWINFO['Res_Workcity3'])+" ) or \
-				 ("+str(JWINFO['Res_Workcity1'])+"=0 and \
-				 	"+str(JWINFO['Res_Workcity2'])+"=0 and \
-				 	"+str(JWINFO['Res_Workcity2'])+"=0 ) ) and \
-				 ( (JobType="+str(JWINFO['Res_JobType1'])+" or \
-				 	JobType="+str(JWINFO['Res_JobType2'])+" or \
-				 	JobType="+str(JWINFO['Res_JobType3'])+" ) or \
-				 	("+str(JWINFO['Res_JobType1'])+"=0 and \
-				 	 "+str(JWINFO['Res_JobType2'])+"=0 and \
-				 	 "+str(JWINFO['Res_JobType3'])+"=0) )\
+		  where Job_Publish_Date between '%s' and '%s' \
+			and	((Job_Workplace_Code/100=%s/100 or Job_Workplace_Code/100=%s/100 or Job_Workplace_Code/100=%s/100 ) or (%s=0 and %s=0 and %s=0 ) or \
+				((Job_Workplace_Code%%10000=0 or %s%%10000=0) and (Job_Workplace_Code/10000=%s/10000) ) or \
+				((Job_Workplace_Code%%10000=0 or %s%%10000=0) and (Job_Workplace_Code/10000=%s/10000) ) or \
+				((Job_Workplace_Code%%10000=0 or %s%%10000=0) and (Job_Workplace_Code/10000=%s/10000) ) )\
+			and ( (JobType=%s or JobType=%s or JobType=%s ) or (%s=0 and %s=0 and %s=0) or \
+				((JobType%%1000=0 or %s%%1000=0) and (JobType/1000=%s/1000) ) or \
+				((JobType%%1000=0 or %s%%1000=0) and (JobType/1000=%s/1000) ) or \
+				((JobType%%1000=0 or %s%%1000=0) and (JobType/1000=%s/1000) ) )\
 		)b on b.[Job_SN]=a.Job_SN\
 		) tmp\
-		group by [Job_SN]"
+		group by [Job_SN]" \
+		% (lastmonth,nowtime,JWINFO['Res_Workcity1']\
+		,JWINFO['Res_Workcity2'],JWINFO['Res_Workcity3']\
+		,JWINFO['Res_Workcity1'],JWINFO['Res_Workcity2']\
+		,JWINFO['Res_Workcity3'],JWINFO['Res_Workcity1']\
+		,JWINFO['Res_Workcity1'],JWINFO['Res_Workcity2']\
+		,JWINFO['Res_Workcity2'],JWINFO['Res_Workcity3']\
+		,JWINFO['Res_Workcity3'],JWINFO['Res_JobType1']\
+		,JWINFO['Res_JobType2'],JWINFO['Res_JobType3']\
+		,JWINFO['Res_JobType1'],JWINFO['Res_JobType2']\
+		,JWINFO['Res_JobType3'],JWINFO['Res_JobType1']\
+		,JWINFO['Res_JobType1'],JWINFO['Res_JobType2']\
+		,JWINFO['Res_JobType2'],JWINFO['Res_JobType3']\
+		,JWINFO['Res_JobType3'])
+
 	result=DBQuery(sql)
 	if result==[]:
 		return Recommend
@@ -221,22 +120,23 @@ def city_type_most_popular_Recommend(u,Ni,nowtime,lastmonth):
 	return Recommend
 
 #city_type_most_popular推荐结果
-def city_type_most_popular_finallyRecommend(Jw_SN):
-	nowtime,lastmonth=getTimes()
+def city_type_most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth):
 	Ni=getNi(nowtime,lastmonth)
 	finallyRecommend=dict()
 	for u in Jw_SN:
 		finallyRecommend[u]=dict()
-		JWINFO=getJWINFO(u)#获取求职者要求及资格
+		#JWINFO=getJWINFO(u)#获取求职者要求及资格
+		uilist=getJW_cando(u,nowtime,lastmonth)#获取符合求职者的职位
 		count=8 #推荐职位数
 		u_recommend=city_type_most_popular_Recommend(u,Ni,nowtime,lastmonth)
 		if u_recommend=={}:
 			continue
 		for i,pif in sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True):
 			#规则过滤 性别不符、学历不符等
-			JOB_OFFER=getJOB_OFFER(i)#获取职位要求
+			#JOB_OFFER=getJOB_OFFER(i)#获取职位要求
 			#是否符合要求
-			if jobIfEffect(JWINFO,JOB_OFFER)==1:
+			#if jobIfEffect(JWINFO,JOB_OFFER)==1:
+			if i in uilist:
 				count-=1
 				finallyRecommend[u][i]=pif
 			if count==0:
@@ -244,29 +144,38 @@ def city_type_most_popular_finallyRecommend(Jw_SN):
 	return finallyRecommend
 
 # most_popular推荐结果
-def most_popular_finallyRecommend(Jw_SN):
-	nowtime,lastmonth=getTimes()
+def most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth):
 	Ni=getNi(nowtime,lastmonth)
 	finallyRecommend=dict()
 	for u in Jw_SN:
 		finallyRecommend[u]=dict()
-		JWINFO=getJWINFO(u)#获取求职者要求及资格
-		count=8 #推荐职位数
+		#JWINFO=getJWINFO(u)#获取求职者要求及资格
+		uilist=getJW_cando(u,nowtime,lastmonth)#获取符合求职者的职位
+		count=8#推荐职位数
 		for i,ni in sorted(Ni.items(),key=operator.itemgetter(1),reverse=True):
 			#规则过滤 性别不符、学历不符等
-			JOB_OFFER=getJOB_OFFER(i)#获取职位要求
+			#JOB_OFFER=getJOB_OFFER(i)#获取职位要求
 			#是否符合要求
-			if jobIfEffect(JWINFO,JOB_OFFER)==1:
+			#if jobIfEffect(JWINFO,JOB_OFFER)==1:
+			if i in uilist:
 				count-=1
 				finallyRecommend[u][i]=ni
 			if count==0:
 				break
 	return finallyRecommend
 
-nowtime,lastmonth=getTimes()
-allJob_SN=getAllJob_SN(nowtime,lastmonth)
-Jw_SN=getAllJw_SN()
-finallyRecommend=city_type_most_popular_finallyRecommend(Jw_SN)
-#finallyRecommend=most_popular_finallyRecommend(Jw_SN)
-# for u,u_recommend in finallyRecommend.items():
-# 	print u,len(u_recommend)
+#无算法推荐
+def noal_finallyRecommend(Jw_SN,nowtime,lastmonth):
+	finallyRecommend=dict()
+	for u in Jw_SN:
+		finallyRecommend[u]=dict()
+		uilist=getJW_cando(u,nowtime,lastmonth)#获取符合求职者的职位
+		count=8#推荐职位数
+		for i in uilist:
+			count-=1
+			finallyRecommend[u][i]=0.001
+			if count==0:
+				break
+	return finallyRecommend
+
+

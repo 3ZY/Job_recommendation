@@ -56,12 +56,13 @@ def itemCF_IUF_Recommend(user,train,W):
 	return rank
 
 #itemCF-IUF推荐结果
-def itemCF_IUF_finallyRecommend(train):
+def itemCF_IUF_finallyRecommend(train,nowtime,lastmonth):
 	W=ItemSimilarity(train)
 	finallyRecommend=dict()
 	for u in train.keys():
 		finallyRecommend[u]=dict()
 		JWINFO=getJWINFO(u)#获取求职者要求及资格
+		#uilist=getJW_cando(u,nowtime,lastmonth)#获取符合求职者的职位
 		u_recommend=itemCF_IUF_Recommend(u,train,W) #求职者u的推荐集合
 		count=8 #推荐职位数
 		for i,pui in sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True):
@@ -69,6 +70,7 @@ def itemCF_IUF_finallyRecommend(train):
 			JOB_OFFER=getJOB_OFFER(i)#获取职位要求
 			#是否符合要求
 			if jobIfEffect(JWINFO,JOB_OFFER)==1:
+			#if i in uilist:
 				count-=1
 				finallyRecommend[u][i]=pui
 			if count==0:
