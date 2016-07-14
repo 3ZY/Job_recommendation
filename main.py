@@ -10,6 +10,17 @@ import math
 import operator
 import time
 
+def outToFile(fileName,recommend):
+	path='result/'
+	outFile=open(path+fileName,'w')
+	outFile.write('Jw_SN,Job_SN...\n')
+	for u,u_recommend in recommend.items():
+		if u_recommend!={}:
+			outFile.write(str(u))
+			for i,p in sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True):
+				outFile.write(','+str(i))
+			outFile.write("\n")
+
 if __name__ == '__main__':
 	start = time.clock()
 	nowtime,lastmonth=getTimes()
@@ -26,13 +37,15 @@ if __name__ == '__main__':
 	# for u,u_recommend in itemCF_IUF_finallyRecommend.items():
 	# 	if u_recommend!={}:
 	# 		print u,sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True)
-	
+	# outToFile('itemCF_IUF_Recommend.csv',itemCF_IUF_finallyRecommend)
+
 	#userCF_IIF推荐结果	
 	# userCF_IIF_finallyRecommend=userCF_IIF_finallyRecommend(trainData,nowtime,lastmonth)
 	# for u,u_recommend in userCF_IIF_finallyRecommend.items():
 	# 	if u_recommend!={}:
 	# 		print u,sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True)
-	
+	#outToFile('userCF_IIF_Recommend.csv',userCF_IIF_finallyRecommend)
+
 	#city_type_most_popular推荐结果
 	#city_type_most_popular_finallyRecommend=city_type_most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth)
 	# for u,u_recommend in city_type_most_popular_finallyRecommend.items():
