@@ -322,5 +322,3 @@ def formatToHtml(fileName):
 				,JOBINFO['Job_Workplace'],JOBINFO['Job_Publish_Date']\
 				,JOBINFO['Job_Requirement'])
 		outFile.write(content)
-
-formatToHtml('userCF_IIF_Recommend.csv')

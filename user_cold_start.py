@@ -120,18 +120,22 @@ def city_type_most_popular_Recommend(u,Ni,nowtime,lastmonth):
 	return Recommend
 
 #city_type_most_popular推荐结果
-def city_type_most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth):
+def city_type_most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth,R_Num=8,finallyRecommend={}):
 	Ni=getNi(nowtime,lastmonth)
-	finallyRecommend=dict()
 	for u in Jw_SN:
-		finallyRecommend[u]=dict()
+		finallyRecommend.setdefault(u,{})
+		alreadyRecommendNum=len(finallyRecommend[u])#已经推荐数
+		if alreadyRecommendNum>=R_Num:
+			continue
 		#JWINFO=getJWINFO(u)#获取求职者要求及资格
 		uilist=getJW_cando(u,nowtime,lastmonth)#获取符合求职者的职位
-		count=8 #推荐职位数
+		count=R_Num-alreadyRecommendNum #推荐职位数
 		u_recommend=city_type_most_popular_Recommend(u,Ni,nowtime,lastmonth)
 		if u_recommend=={}:
 			continue
 		for i,pif in sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True):
+			if i in finallyRecommend[u]:#已推荐过
+				continue
 			#规则过滤 性别不符、学历不符等
 			#JOB_OFFER=getJOB_OFFER(i)#获取职位要求
 			#是否符合要求
@@ -144,15 +148,19 @@ def city_type_most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth):
 	return finallyRecommend
 
 # most_popular推荐结果
-def most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth):
+def most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth,R_Num=8,finallyRecommend={}):
 	Ni=getNi(nowtime,lastmonth)
-	finallyRecommend=dict()
 	for u in Jw_SN:
-		finallyRecommend[u]=dict()
+		finallyRecommend.setdefault(u,{})
+		alreadyRecommendNum=len(finallyRecommend[u])#已经推荐数
+		if alreadyRecommendNum>=R_Num:
+			continue
 		#JWINFO=getJWINFO(u)#获取求职者要求及资格
 		uilist=getJW_cando(u,nowtime,lastmonth)#获取符合求职者的职位
-		count=8#推荐职位数
+		count=R_Num-alreadyRecommendNum#推荐职位数
 		for i,ni in sorted(Ni.items(),key=operator.itemgetter(1),reverse=True):
+			if i in finallyRecommend[u]:#已推荐过
+				continue
 			#规则过滤 性别不符、学历不符等
 			#JOB_OFFER=getJOB_OFFER(i)#获取职位要求
 			#是否符合要求
@@ -165,13 +173,17 @@ def most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth):
 	return finallyRecommend
 
 #无算法推荐
-def noal_finallyRecommend(Jw_SN,nowtime,lastmonth):
-	finallyRecommend=dict()
+def noal_finallyRecommend(Jw_SN,nowtime,lastmonth,R_Num=8,finallyRecommend={}):
 	for u in Jw_SN:
-		finallyRecommend[u]=dict()
+		finallyRecommend.setdefault(u,{})
+		alreadyRecommendNum=len(finallyRecommend[u])#已经推荐数
+		if alreadyRecommendNum>=R_Num:
+			continue
 		uilist=getJW_cando(u,nowtime,lastmonth)#获取符合求职者的职位
-		count=8#推荐职位数
+		count=R_Num-alreadyRecommendNum#推荐职位数
 		for i in uilist:
+			if i in finallyRecommend[u]:#已推荐过
+				continue
 			count-=1
 			finallyRecommend[u][i]=0.001
 			if count==0:
