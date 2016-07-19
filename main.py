@@ -69,7 +69,7 @@ if __name__ == '__main__':
 	#推荐补全
 	finallyRecommend=fill_finallyRecommend(Jw_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_Num,finallyRecommend)
 	fill_time=time.clock()
-	print u"noal耗时: %f s" % (fill_time - noal_time)
+	print u"fill耗时: %f s" % (fill_time - noal_time)
 
 	# for u,u_recommend in finallyRecommend.items():
 	# 	print u,sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True)
