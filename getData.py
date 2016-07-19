@@ -52,21 +52,21 @@ def CalculateAge(Birthday):
 def getTrainData(nowtime,lastmonth):
 	train=dict()
 
-	# #JW_QUERY_LOG
-	# sql="SELECT [Jw_SN]\
-	# 		,[Job_SN]\
-	# 	FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
-	# 	WHERE VDate between '%s' and '%s'\
-	# 	and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
-	#	[Job_Publish_Date] between '%s' and '%s')" \
-	#	% (lastmonth,nowtime,lastmonth,nowtime)
+	#JW_QUERY_LOG
+	sql="SELECT [Jw_SN]\
+			,[Job_SN]\
+		FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
+		WHERE VDate between '%s' and '%s'\
+		and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
+		[Job_Publish_Date] between '%s' and '%s')" \
+		% (lastmonth,nowtime,lastmonth,nowtime)
 	
 
-	# result=DBQuery(sql)
-	# for data in result:
-	# 	if data[0] not in train:
-	# 		train[data[0]]=dict()
-	# 	train[data[0]][data[1]]=0.1 #查看行为兴趣设定
+	result=DBQuery(sql)
+	for data in result:
+		if data[0] not in train:
+			train[data[0]]=dict()
+		train[data[0]][data[1]]=0.1 #查看行为兴趣设定
 
 	#JOB_FAV
 	sql="SELECT [Jw_SN]\
@@ -100,45 +100,13 @@ def getTrainData(nowtime,lastmonth):
 
 	return train
 
-#获取求职者要求及资格
-def getJWINFO(Jw_SN):
-	
+#获得JWINFO及JOB_OFFER,求职者信息及职位信息
+def getJWJOBINFO(nowtime,lastmonth):
 	JWINFO=dict()
-	sql="SELECT [Jw_Type]\
-		,[Res_Sex]\
-		,[Res_birthday]\
-		,[Res_Learn]\
-		,[Res_Expr_Years]\
-		,[Res_SN]\
-		from [AnalysisData].[dbo].[JWINFO]\
-		where [Jw_SN]="+str(Jw_SN)
-	result=DBQuery(sql)
-
-	#数据库不完整,缺失数据
-	if result==[]:
-		return JWINFO
-
-	for data in result:
-		JWINFO['Jw_Type']=data[0]
-		JWINFO['Res_Sex']=data[1]
-		JWINFO['Age']=CalculateAge(data[2])
-		JWINFO['Res_Learn']=data[3]
-		JWINFO['Res_Expr_Years']=data[4]
-		JWINFO['Res_SN']=data[5]
-
-
-
-	if JWINFO['Res_SN']==0:
-		JWINFO['Res_Money']=0
-		JWINFO['Res_JobType1']=0
-		JWINFO['Res_JobType2']=0
-		JWINFO['Res_JobType3']=0
-		JWINFO['Res_Jobkind']=0
-		JWINFO['Res_Workcity1']=0
-		JWINFO['Res_Workcity2']=0
-		JWINFO['Res_Workcity3']=0
-	else:
-		sql="SELECT [Res_Money]\
+	RESUME=dict()
+	JOB_OFFER=dict()
+	sql="SELECT [Res_SN]\
+			,[Res_Money]\
 			,[Res_JobType1]\
 			,[Res_JobType2]\
 			,[Res_JobType3]\
@@ -146,24 +114,58 @@ def getJWINFO(Jw_SN):
 			,[Res_Workcity1]\
 			,[Res_Workcity2]\
 			,[Res_Workcity3]\
-			FROM [AnalysisData].[dbo].[RESUME]\
-			where [Res_SN]="+str(JWINFO['Res_SN'])
-		result=DBQuery(sql)
-		for data in result:
-			JWINFO['Res_Money']=data[0]
-			JWINFO['Res_JobType1']=data[1]
-			JWINFO['Res_JobType2']=data[2]
-			JWINFO['Res_JobType3']=data[3]
-			JWINFO['Res_Jobkind']=data[4]
-			JWINFO['Res_Workcity1']=data[5]
-			JWINFO['Res_Workcity2']=data[6]
-			JWINFO['Res_Workcity3']=data[7]
-	return JWINFO
+			FROM [AnalysisData].[dbo].[RESUME]"
+	result=DBQuery(sql)
+	for data in result:
+		RESUME[data[0]]=dict()
+		RESUME[data[0]]['Res_Money']=data[1]
+		RESUME[data[0]]['Res_JobType1']=data[2]
+		RESUME[data[0]]['Res_JobType2']=data[3]
+		RESUME[data[0]]['Res_JobType3']=data[4]
+		RESUME[data[0]]['Res_Jobkind']=data[5]
+		RESUME[data[0]]['Res_Workcity1']=data[6]
+		RESUME[data[0]]['Res_Workcity2']=data[7]
+		RESUME[data[0]]['Res_Workcity3']=data[8]
 
-#获取职位要求
-def getJOB_OFFER(Job_SN):
-	JOB_OFFER=dict()
-	sql="SELECT [Job_Publish_Date]\
+	sql="SELECT [Jw_SN]\
+		,[Jw_Type]\
+		,[Res_Sex]\
+		,[Res_birthday]\
+		,[Res_Learn]\
+		,[Res_Expr_Years]\
+		,[Res_SN]\
+		from [AnalysisData].[dbo].[JWINFO]"
+	result=DBQuery(sql)
+	for data in result:
+		JWINFO[data[0]]=dict()
+		JWINFO[data[0]]['Jw_Type']=data[1]
+		JWINFO[data[0]]['Res_Sex']=data[2]
+		JWINFO[data[0]]['Age']=CalculateAge(data[3])
+		JWINFO[data[0]]['Res_Learn']=data[4]
+		JWINFO[data[0]]['Res_Expr_Years']=data[5]
+		JWINFO[data[0]]['Res_SN']=data[6]
+		if JWINFO[data[0]]['Res_SN']==0:
+			JWINFO[data[0]]['Res_Money']=0
+			JWINFO[data[0]]['Res_JobType1']=0
+			JWINFO[data[0]]['Res_JobType2']=0
+			JWINFO[data[0]]['Res_JobType3']=0
+			JWINFO[data[0]]['Res_Jobkind']=0
+			JWINFO[data[0]]['Res_Workcity1']=0
+			JWINFO[data[0]]['Res_Workcity2']=0
+			JWINFO[data[0]]['Res_Workcity3']=0
+		else:
+			JWINFO[data[0]]['Res_Money']=RESUME[data[6]]['Res_Money']
+			JWINFO[data[0]]['Res_JobType1']=RESUME[data[6]]['Res_JobType1']
+			JWINFO[data[0]]['Res_JobType2']=RESUME[data[6]]['Res_JobType2']
+			JWINFO[data[0]]['Res_JobType3']=RESUME[data[6]]['Res_JobType3']
+			JWINFO[data[0]]['Res_Jobkind']=RESUME[data[6]]['Res_Jobkind']
+			JWINFO[data[0]]['Res_Workcity1']=RESUME[data[6]]['Res_Workcity1']
+			JWINFO[data[0]]['Res_Workcity2']=RESUME[data[6]]['Res_Workcity2']
+			JWINFO[data[0]]['Res_Workcity3']=RESUME[data[6]]['Res_Workcity3']
+	del RESUME
+	
+	sql="SELECT [Job_SN]\
+		,[Job_Publish_Date]\
 		,[JobType]\
 		,[Job_Money]\
 		,[Job_Learn_Limited]\
@@ -174,69 +176,22 @@ def getJOB_OFFER(Job_SN):
 		,[Job_Expr_Years]\
 		,[Job_Workplace_Code]\
 		FROM [AnalysisData].[dbo].[JOB_OFFER]\
-		where [Job_SN]="+str(Job_SN)
+		where Job_Publish_Date between '%s' and '%s'"\
+		% (lastmonth,nowtime)
 	result=DBQuery(sql)
-	#数据库不完整,缺失数据
-	if result==[]:
-		return JOB_OFFER
 	for data in result:
-		# JOB_OFFER['Job_effect']=CalculateJobIfEffect(data[0])
-		JOB_OFFER['JobType']=data[1]
-		JOB_OFFER['Job_Money']=data[2]
-		JOB_OFFER['Job_Learn_Limited']=data[3]
-		JOB_OFFER['Job_Sex']=data[4]
-		JOB_OFFER['Job_Kind']=data[5]
-		JOB_OFFER['Job_Agelowest']=data[6]
-		JOB_OFFER['Job_Agehighest']=data[7]
-		JOB_OFFER['Job_Expr_Years']=data[8]
-		JOB_OFFER['Job_Workplace_Code']=data[9]
+		JOB_OFFER[data[0]]=dict()
+		JOB_OFFER[data[0]]['JobType']=data[2]
+		JOB_OFFER[data[0]]['Job_Money']=data[3]
+		JOB_OFFER[data[0]]['Job_Learn_Limited']=data[4]
+		JOB_OFFER[data[0]]['Job_Sex']=data[5]
+		JOB_OFFER[data[0]]['Job_Kind']=data[6]
+		JOB_OFFER[data[0]]['Job_Agelowest']=data[7]
+		JOB_OFFER[data[0]]['Job_Agehighest']=data[8]
+		JOB_OFFER[data[0]]['Job_Expr_Years']=data[9]
+		JOB_OFFER[data[0]]['Job_Workplace_Code']=data[10]
+	return JWINFO,JOB_OFFER
 
-	return JOB_OFFER
-
-#获取符合用户u的职位
-def getJW_cando(u,nowtime,lastmonth):
-	JWINFO=getJWINFO(u)
-	if 'Res_SN' not in JWINFO:
-		return []
-	sql="SELECT [Job_SN] \
-	FROM [AnalysisData].[dbo].[JOB_OFFER] \
-	where Job_Publish_Date between '%s' and '%s' \
-	and ((Job_Workplace_Code/100=%s/100 or Job_Workplace_Code/100=%s/100 or Job_Workplace_Code/100=%s/100 ) or (%s=0 and %s=0 and %s=0 ) or \
-		((Job_Workplace_Code%%10000=0 or %s%%10000=0) and (Job_Workplace_Code/10000=%s/10000) ) or \
-		((Job_Workplace_Code%%10000=0 or %s%%10000=0) and (Job_Workplace_Code/10000=%s/10000) ) or \
-		((Job_Workplace_Code%%10000=0 or %s%%10000=0) and (Job_Workplace_Code/10000=%s/10000) ) )\
-	and ( (JobType=%s or JobType=%s or JobType=%s ) or (%s=0 and %s=0 and %s=0) or \
-		((JobType%%1000=0 or %s%%1000=0) and (JobType/1000=%s/1000) ) or \
-		((JobType%%1000=0 or %s%%1000=0) and (JobType/1000=%s/1000) ) or \
-		((JobType%%1000=0 or %s%%1000=0) and (JobType/1000=%s/1000) ) )\
-	and (Job_Money>=%s or %s=15) \
-	and  (Job_Learn_Limited<=%s or %s=0) \
-	and  (Job_Sex=%s or Job_Sex=0) \
-	and  (Job_Kind='%s' or '%s'='0') \
-	and  (Job_Agelowest<=%s or %s=-1) \
-	and (Job_Agehighest=0 or Job_Agehighest>=%s) \
-	and (Job_Expr_Years<=%s)"\
-	% (lastmonth,nowtime,JWINFO['Res_Workcity1']\
-		,JWINFO['Res_Workcity2'],JWINFO['Res_Workcity3']\
-		,JWINFO['Res_Workcity1'],JWINFO['Res_Workcity2']\
-		,JWINFO['Res_Workcity3'],JWINFO['Res_Workcity1']\
-		,JWINFO['Res_Workcity1'],JWINFO['Res_Workcity2']\
-		,JWINFO['Res_Workcity2'],JWINFO['Res_Workcity3']\
-		,JWINFO['Res_Workcity3'],JWINFO['Res_JobType1']\
-		,JWINFO['Res_JobType2'],JWINFO['Res_JobType3']\
-		,JWINFO['Res_JobType1'],JWINFO['Res_JobType2']\
-		,JWINFO['Res_JobType3'],JWINFO['Res_JobType1']\
-		,JWINFO['Res_JobType1'],JWINFO['Res_JobType2']\
-		,JWINFO['Res_JobType2'],JWINFO['Res_JobType3']\
-		,JWINFO['Res_JobType3'],JWINFO['Res_Money']\
-		,JWINFO['Res_Money'],JWINFO['Res_Learn']\
-		,JWINFO['Res_Learn'],JWINFO['Res_Sex']\
-		,JWINFO['Res_Jobkind'],JWINFO['Res_Jobkind']\
-		,JWINFO['Age'],JWINFO['Age'],JWINFO['Age']\
-		,JWINFO['Res_Expr_Years'])	
-	result=DBQuery(sql)
-	ilist=[ data[0] for data in result]
-	return ilist
 
 #获得所有Jw_SN
 def getAllJw_SN():

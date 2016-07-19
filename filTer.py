@@ -64,3 +64,39 @@ def jobIfEffect(JWINFO,JOB_OFFER):
 		return 0
 
 	return 1
+
+#是否符合期望工作地点及工作类型特征
+def city_tpye_IfEffect(JWINFO,JOB_OFFER):
+	
+	#数据不完整,缺失数据
+	if 'JobType' not in JOB_OFFER:
+		return 0
+	if 'Res_SN' not in JWINFO:
+		return 0
+
+	#数据库未设有效期
+	# if JOB_OFFER['Job_effect']==0:
+	# 	pass
+	# 	#return 0
+
+	#职位类型
+	if  JOB_OFFER['JobType']!=JWINFO['Res_JobType1'] and\
+		JOB_OFFER['JobType']!=JWINFO['Res_JobType2'] and\
+		JOB_OFFER['JobType']!=JWINFO['Res_JobType3'] and\
+		not(JWINFO['Res_JobType3']==0 and JWINFO['Res_JobType2']==0 and JWINFO['Res_JobType1']==0) and\
+		not( (JOB_OFFER['JobType']%1000==0 or JWINFO['Res_JobType1']%1000==0) and int(JOB_OFFER['JobType']/1000)==int(JWINFO['Res_JobType1']/1000) ) and\
+		not( (JOB_OFFER['JobType']%1000==0 or JWINFO['Res_JobType2']%1000==0) and int(JOB_OFFER['JobType']/1000)==int(JWINFO['Res_JobType2']/1000) ) and\
+		not( (JOB_OFFER['JobType']%1000==0 or JWINFO['Res_JobType3']%1000==0) and int(JOB_OFFER['JobType']/1000)==int(JWINFO['Res_JobType3']/1000) ):
+		return 0
+
+	#工作城市
+	if ((JOB_OFFER['Job_Workplace_Code']/100==JWINFO['Res_Workcity1']/100 or \
+		JOB_OFFER['Job_Workplace_Code']/100==JWINFO['Res_Workcity2']/100 or \
+		JOB_OFFER['Job_Workplace_Code']/100==JWINFO['Res_Workcity3']/100 ) or \
+		( JWINFO['Res_Workcity1']==0 and JWINFO['Res_Workcity2']==0 and JWINFO['Res_Workcity3']==0 ) or \
+		((JOB_OFFER['Job_Workplace_Code']%10000==0 or JWINFO['Res_Workcity1']%10000==0) and (JOB_OFFER['Job_Workplace_Code']/10000==JWINFO['Res_Workcity1']/10000) ) or \
+		((JOB_OFFER['Job_Workplace_Code']%10000==0 or JWINFO['Res_Workcity2']%10000==0) and (JOB_OFFER['Job_Workplace_Code']/10000==JWINFO['Res_Workcity2']/10000) ) or \
+		((JOB_OFFER['Job_Workplace_Code']%10000==0 or JWINFO['Res_Workcity3']%10000==0) and (JOB_OFFER['Job_Workplace_Code']/10000==JWINFO['Res_Workcity3']/10000) ) )==0:
+		return 0
+
+	return 1

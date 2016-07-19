@@ -3,7 +3,6 @@
 #userCF-IIF
 from __future__ import division
 from filTer import *
-from getData import *
 import math
 import operator
 
@@ -62,27 +61,24 @@ def userCF_IIF_Recommend(user,train,W):
 	return rank
 
 #userCF-IIF推荐结果
-def userCF_IIF_finallyRecommend(train,nowtime,lastmonth, R_Num=8,finallyRecommend={}):
+def userCF_IIF_finallyRecommend(train,JWINFO,JOB_OFFER,R_Num=8,finallyRecommend={}):
 	W=UserSimilarity(train)
 	for u in train.keys():
-		if u not in W:
+		if (u not in W) or (u not in JWINFO):
 			continue
 		finallyRecommend.setdefault(u,{})
 		alreadyRecommendNum=len(finallyRecommend[u])#已经推荐数
 		if alreadyRecommendNum>=R_Num:
 			continue
-		JWINFO=getJWINFO(u)#获取求职者要求及资格
-		#uilist=getJW_cando(u,nowtime,lastmonth)#获取符合求职者的职位
 		u_recommend=userCF_IIF_Recommend(u,train,W) #求职者u的推荐集合
 		count=R_Num-alreadyRecommendNum #推荐职位数
 		for i,pui in sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True):
 			if i in finallyRecommend[u]:#已推荐过
 				continue
+			if i not in JOB_OFFER:
+				continue
 			#规则过滤 性别不符、学历不符等
-			JOB_OFFER=getJOB_OFFER(i)#获取职位要求
-			#是否符合要求
-			if jobIfEffect(JWINFO,JOB_OFFER)==1:
-			#if i in uilist:
+			if jobIfEffect(JWINFO[u],JOB_OFFER[i])==1:
 				count-=1
 				finallyRecommend[u][i]=pui
 			if count==0:
