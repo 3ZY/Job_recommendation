@@ -55,12 +55,15 @@ def getJWINFO(u):
 	JWINFO['Res_SN']=data[18]
 	JWINFO['Jw_CreditPoint']=data[19]
 
-	sql="SELECT [IName]     \
-  FROM [AnalysisData].[dbo].[List_Down] \
-  where ICode='%s' and lx='15'" % (JWINFO['Res_Learn'])
-	result=DBQuery(sql)
-	data=result[0]
-	JWINFO['Res_Learn']=data[0]
+	if JWINFO['Res_Learn']==0:
+		JWINFO['Res_Learn']=u'无'
+	else:
+		sql="SELECT [IName]     \
+	  FROM [AnalysisData].[dbo].[List_Down] \
+	  where ICode='%s' and lx='15'" % (JWINFO['Res_Learn'])
+		result=DBQuery(sql)
+		data=result[0]
+		JWINFO['Res_Learn']=data[0]
 
 	sql="SELECT [IName]     \
   FROM [AnalysisData].[dbo].[List_Down] \
@@ -84,10 +87,11 @@ def getJWINFO(u):
 		JWINFO['Res_Workcity1']=u'——'
 		JWINFO['Res_Workcity2']=u'——'
 		JWINFO['Res_Workcity3']=u'——'
-		
+		return JWINFO
+
 	sql="SELECT * \
   FROM [AnalysisData].[dbo].[RESUME] \
-  where res_sn='%s'" % (JWINFO['Res_SN'])
+  where [Res_SN]='%s'" % (JWINFO['Res_SN'])
 	result=DBQuery(sql)
 	data=result[0]
 	JWINFO['Res_Publish_Date']=data[1]
@@ -129,12 +133,15 @@ def getJWINFO(u):
 		data=result[0]
 		JWINFO['Res_JobType3']=data[0]
 	
-	sql="SELECT [IName]    \
-	FROM [AnalysisData].[dbo].[List_Down] \
-	where ICode='%s' and lx='6'" % (JWINFO['Res_Money'])
-	result=DBQuery(sql)
-	data=result[0]
-	JWINFO['Res_Money']=data[0]
+	if JWINFO['Res_Money']==0:
+		JWINFO['Res_Money']=u'——'
+	else:
+		sql="SELECT [IName]    \
+		FROM [AnalysisData].[dbo].[List_Down] \
+		where ICode='%s' and lx='6'" % (JWINFO['Res_Money'])
+		result=DBQuery(sql)
+		data=result[0]
+		JWINFO['Res_Money']=data[0]
 
 	return JWINFO
 
@@ -193,12 +200,15 @@ def getJOBINFO(i):
 	data=result[0]
 	JOBINFO['JobType']=data[0]
 
-	sql="SELECT [IName]    \
-	FROM [AnalysisData].[dbo].[List_Down] \
-	where ICode='%s' and lx='6'" % (JOBINFO['Job_Money'])
-	result=DBQuery(sql)
-	data=result[0]
-	JOBINFO['Job_Money']=data[0]
+	if JOBINFO['Job_Money']==0:
+		JOBINFO['Job_Money']='面议'
+	else:
+		sql="SELECT [IName]    \
+		FROM [AnalysisData].[dbo].[List_Down] \
+		where ICode='%s' and lx='6'" % (JOBINFO['Job_Money'])
+		result=DBQuery(sql)
+		data=result[0]
+		JOBINFO['Job_Money']=data[0]
 
 	sql="SELECT [IName]    \
 	FROM [AnalysisData].[dbo].[List_Down] \
