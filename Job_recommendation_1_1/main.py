@@ -23,14 +23,14 @@ def outToFile(fileName,recommend):
 			outFile.write("\n")
 
 if __name__ == '__main__':
-
+	
 	start = time.clock()
 	nowtime,lastmonth=getTimes()
 	nowtime='2014-5-1'
-	lastmonth='2014-4-1'
+	lastmonth='2014-4-1'	
 	R_Num=8 #推荐职位数
-
-	#获取数据
+	
+	#获取数据	
 	allJob_SN=getAllJob_SN(nowtime,lastmonth)#时间段内所有职位
 	Jw_SN=getAllJw_SN()#获得所有求职者
 	JWINFO,JOB_OFFER=getJWJOBINFO(nowtime,lastmonth)#获得求职者信息及职位信息
@@ -49,21 +49,36 @@ if __name__ == '__main__':
 	itemCF_IUF_time=time.clock()
 	print u"itemCF_IUF耗时: %f s" % (itemCF_IUF_time - userCF_IIF_time)
 
-	del trainData#训练数据销毁
+	#city_type_most_popular推荐
+	finallyRecommend=city_type_most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth,trainData,JWINFO,JOB_OFFER,R_Num,finallyRecommend)
+	city_type_most_popular_time=time.clock()
+	print u"city_type_most_popular耗时: %f s" % (city_type_most_popular_time - itemCF_IUF_time)
 
+	del trainData#训练数据销毁
+	
 	#most_popular推荐
 	finallyRecommend=most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_Num,finallyRecommend)
 	most_popular_time=time.clock()
-	print u"most_popular耗时: %f s" % (most_popular_time - itemCF_IUF_time)
+	print u"most_popular耗时: %f s" % (most_popular_time - city_type_most_popular_time)
+
+	#noal推荐
+	finallyRecommend=noal_finallyRecommend(Jw_SN,JWINFO,JOB_OFFER,allJob_SN,R_Num,finallyRecommend)
+	noal_time=time.clock()
+	print u"noal耗时: %f s" % (noal_time - most_popular_time)
+
+	#推荐补全
+	finallyRecommend=fill_finallyRecommend(Jw_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_Num,finallyRecommend)
+	fill_time=time.clock()
+	print u"fill耗时: %f s" % (fill_time - noal_time)
 
 	# for u,u_recommend in finallyRecommend.items():
 	# 	print u,sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True)
-
+	
 	#结果输出到文件
 	outToFile('finallyRecommend.csv',finallyRecommend)
-
+	
 	end = time.clock()
 	print u"耗时: %f s" % (end - start)
-
+	
 	#html显示结果
 	#formatToHtml('finallyRecommend.csv')

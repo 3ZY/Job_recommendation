@@ -8,7 +8,7 @@ def DBQuery(sql):
 	host='127.0.0.1'
 	port='1433'
 	user='sa'
-	password='almp123456'
+	password='***********'
 	database='AnalysisData'
 	conn=pymssql.connect(host=host,port=port,user=user,password=password,database=database)
 	#获取游标对象
