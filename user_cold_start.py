@@ -111,7 +111,7 @@ def CB_fill_finallyRecommend(Jw_SN,Job_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_N
 		for i,ni in sorted(Ni.items(),key=operator.itemgetter(1),reverse=True):
 			if i in finallyRecommend[u]:#已推荐过
 				continue
-			if sex_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
+			if sex_city_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
 				count-=1
 				finallyRecommend[u][i]=0.001
 			if count==0:
