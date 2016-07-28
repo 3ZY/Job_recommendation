@@ -41,7 +41,7 @@ def getNi(nowtime,lastmonth):
 		  where Job_Publish_Date between '%s' and '%s' \
 		)b on b.[Job_SN]=a.Job_SN\
 		) tmp\
-		group by [Job_SN]" \
+		group by [Job_SN] " \
 		% (lastmonth,nowtime)
 
 	result=DBQuery(sql)
@@ -77,12 +77,32 @@ def most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_Num
 		for i,ni in sorted(Ni.items(),key=operator.itemgetter(1),reverse=True):
 			if i in finallyRecommend[u]:#已推荐过
 				continue
-			#规则过滤期望城市及期望工作
+			#规则过滤期望城市，期望工作，性别
 			if city_tpye_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
 				count-=1
 				finallyRecommend[u][i]=0.005
 			if count==0:
 				break
+	return finallyRecommend
+
+def CB_fill_finallyRecommend(Jw_SN,Job_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_Num=8,finallyRecommend={}):
+	Ni=getNi(nowtime,lastmonth)
+	for u in Jw_SN:
+		finallyRecommend.setdefault(u,{})
+		#基于简历内容推荐
+		alreadyRecommendNum=len(finallyRecommend[u])#已经推荐数
+		if alreadyRecommendNum>=R_Num:
+			continue
+		count=R_Num-alreadyRecommendNum#推荐职位数
+		for i in Job_SN:
+			if i in finallyRecommend[u]:#已推荐过
+				continue
+			if city_tpye_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
+				count-=1
+				finallyRecommend[u][i]=0.005
+			if count==0:
+				break
+
 		#推荐补全
 		alreadyRecommendNum=len(finallyRecommend[u])#已经推荐数
 		if alreadyRecommendNum>=R_Num:
@@ -91,8 +111,10 @@ def most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_Num
 		for i,ni in sorted(Ni.items(),key=operator.itemgetter(1),reverse=True):
 			if i in finallyRecommend[u]:#已推荐过
 				continue
-			count-=1
-			finallyRecommend[u][i]=0.001
+			if sex_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
+				count-=1
+				finallyRecommend[u][i]=0.001
 			if count==0:
 				break
+
 	return finallyRecommend

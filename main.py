@@ -26,12 +26,12 @@ if __name__ == '__main__':
 
 	start = time.clock()
 	nowtime,lastmonth=getTimes()
-	nowtime='2014-5-1'
-	lastmonth='2014-4-1'
+	nowtime='2016-7-28'
+	lastmonth='2016-6-1'
 	R_Num=8 #推荐职位数
 
 	#获取数据
-	allJob_SN=getAllJob_SN(nowtime,lastmonth)#时间段内所有职位
+	Job_SN=getAllJob_SN(nowtime,lastmonth)#时间段内所有职位
 	Jw_SN=getAllJw_SN()#获得所有求职者
 	JWINFO,JOB_OFFER=getJWJOBINFO(nowtime,lastmonth)#获得求职者信息及职位信息
 	trainData=getTrainData(nowtime,lastmonth)
@@ -56,6 +56,11 @@ if __name__ == '__main__':
 	most_popular_time=time.clock()
 	print u"most_popular耗时: %f s" % (most_popular_time - itemCF_IUF_time)
 
+	#CB_fill推荐
+	finallyRecommend=CB_fill_finallyRecommend(Jw_SN,Job_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_Num,finallyRecommend)
+	CB_fill_time=time.clock()
+	print u"CB_fill耗时: %f s" % (CB_fill_time - most_popular_time)
+
 	# for u,u_recommend in finallyRecommend.items():
 	# 	print u,sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True)
 
@@ -66,4 +71,4 @@ if __name__ == '__main__':
 	print u"耗时: %f s" % (end - start)
 
 	#html显示结果
-	#formatToHtml('finallyRecommend.csv')
+	# formatToHtml('finallyRecommend.csv')

@@ -60,28 +60,13 @@ def getTrainData(nowtime,lastmonth):
 		and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
 		[Job_Publish_Date] between '%s' and '%s')" \
 		% (lastmonth,nowtime,lastmonth,nowtime)
-	
+
 
 	result=DBQuery(sql)
 	for data in result:
 		if data[0] not in train:
 			train[data[0]]=dict()
 		train[data[0]][data[1]]=0.1 #查看行为兴趣设定
-
-	#JOB_FAV
-	sql="SELECT [Jw_SN]\
-			,[Job_SN]\
-		FROM [AnalysisData].[dbo].[JOB_FAV]\
-		WHERE Add_Date between '%s' and '%s' \
-		and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
-		[Job_Publish_Date] between '%s' and '%s')" \
-		% (lastmonth,nowtime,lastmonth,nowtime)
-
-	result=DBQuery(sql)
-	for data in result:
-		if data[0] not in train:
-			train[data[0]]=dict()
-		train[data[0]][data[1]]=0.3 #收藏行为兴趣设定
 
 	#JWAPPLYJOB
 	sql="SELECT [Jw_SN]\
@@ -96,7 +81,22 @@ def getTrainData(nowtime,lastmonth):
 	for data in result:
 		if data[0] not in train:
 			train[data[0]]=dict()
-		train[data[0]][data[1]]=0.6 #应聘行为兴趣设定
+		train[data[0]][data[1]]=0.3 #应聘行为兴趣设定
+
+	#JOB_FAV
+	sql="SELECT [Jw_SN]\
+			,[Job_SN]\
+		FROM [AnalysisData].[dbo].[JOB_FAV]\
+		WHERE Add_Date between '%s' and '%s' \
+		and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
+		[Job_Publish_Date] between '%s' and '%s')" \
+		% (lastmonth,nowtime,lastmonth,nowtime)
+
+	result=DBQuery(sql)
+	for data in result:
+		if data[0] not in train:
+			train[data[0]]=dict()
+		train[data[0]][data[1]]=0.6 #收藏行为兴趣设定
 
 	return train
 
@@ -163,7 +163,7 @@ def getJWJOBINFO(nowtime,lastmonth):
 			JWINFO[data[0]]['Res_Workcity2']=RESUME[data[6]]['Res_Workcity2']
 			JWINFO[data[0]]['Res_Workcity3']=RESUME[data[6]]['Res_Workcity3']
 	del RESUME
-	
+
 	sql="SELECT [Job_SN]\
 		,[Job_Publish_Date]\
 		,[JobType]\
@@ -205,7 +205,7 @@ def getAllJw_SN():
 
 #获得最新一个月内所有职位
 def getAllJob_SN(nowtime,lastmonth):
-	
+
 	sql="SELECT distinct Job_SN \
 	from [AnalysisData].[dbo].[JOB_OFFER] \
 	where Job_Publish_Date between '%s' and '%s'"\

@@ -23,211 +23,212 @@ def CalculateAge(Birthday):
 			return Today.year-Birthday.year-1
 
 #获得求职者信息
-def getJWINFO(u):
-	
+def getJWINFO():
+
+	lx_ICode_IName={}
+	sql="SELECT [IName]\
+      ,[ICode]\
+      ,[lx]\
+  FROM [AnalysisData].[dbo].[List_Down]"
+	result=DBQuery(sql)
+	for data in result:
+		lx_ICode_IName.setdefault(data[2],{})
+		lx_ICode_IName[data[2]][data[1]]=data[0]
+
+	Jobtype={}
+	sql="SELECT [name] \
+	,[uid]\
+ FROM [AnalysisData].[dbo].[Jobtype]"
+ 	result=DBQuery(sql)
+	for data in result:
+		Jobtype.setdefault(data[1],data[0])
+
+	RESUME=dict()
+	sql="SELECT * \
+  FROM [AnalysisData].[dbo].[RESUME]"
+	result=DBQuery(sql)
+	for data in result:
+		RESUME[data[15]]={}
+		RESUME[data[15]]['Res_Publish_Date']=data[1]
+		RESUME[data[15]]['Res_Edu_Trade']=data[2]
+		RESUME[data[15]]['Res_Ability']=data[3]
+		RESUME[data[15]]['Res_Dir']=data[4]
+		RESUME[data[15]]['Res_Job_Want']=data[5]
+		RESUME[data[15]]['Res_Self_Intro']=data[6]
+		RESUME[data[15]]['Res_Money']=str(data[7])
+		RESUME[data[15]]['Res_JobType1']=data[8]
+		RESUME[data[15]]['Res_JobType2']=data[9]
+		RESUME[data[15]]['Res_JobType3']=data[10]
+		RESUME[data[15]]['Res_Jobkind']=data[11]
+		RESUME[data[15]]['Res_Workcity1']=data[12]
+		RESUME[data[15]]['Res_Workcity2']=data[13]
+		RESUME[data[15]]['Res_Workcity3']=data[14]
+
 	JWINFO=dict()
-
 	sql="SELECT * \
-	FROM [AnalysisData].[dbo].[JWINFO]  \
-	where Jw_SN='%s'" % (u)
+	FROM [AnalysisData].[dbo].[JWINFO]"
 	result=DBQuery(sql)
-	data=result[0]
+	for data in result:
+		JWINFO[data[0]]={}
+		JWINFO[data[0]]['Jw_Name']=data[1]
+		JWINFO[data[0]]['Jw_Type']= u'社会人士' if data[2]==0 else u'应届毕业生'
+		JWINFO[data[0]]['Jw_Action']=data[3]
+		JWINFO[data[0]]['Jw_IndustryJob']=data[4]
+		JWINFO[data[0]]['Res_Sex']=u'男' if data[5]==1 else u'女'
+		JWINFO[data[0]]['Res_birthday']=data[6].strftime('%Y-%m-%d') if data[6] !=None else u'——'
+		JWINFO[data[0]]['Age']=CalculateAge(data[6])
+		JWINFO[data[0]]['Res_Height']=data[7]
+		JWINFO[data[0]]['Res_Marry']= u'未婚' if data[8]==0 else u'已婚'
+		JWINFO[data[0]]['Res_Learn']=str(data[9])
+		JWINFO[data[0]]['Res_GSchool']=data[10]
+		JWINFO[data[0]]['Res_Major']=data[11]
+		JWINFO[data[0]]['Res_English']=data[12] if data[12]!=None else u'——'
+		JWINFO[data[0]]['Res_Hukou']=data[13]
+		JWINFO[data[0]]['Res_Livin']=data[14]
+		JWINFO[data[0]]['Res_Comp_Ability']=data[15]
+		JWINFO[data[0]]['Res_Expr_Years']=str(data[16]) if data[16]!=-1 else '0'
+		JWINFO[data[0]]['Res_Has_Picture']=data[17]
+		JWINFO[data[0]]['Res_SN']=data[18]
+		JWINFO[data[0]]['Jw_CreditPoint']=data[19]
 
-	JWINFO['Jw_SN']=data[0]
-	JWINFO['Jw_Name']=data[1]
-	JWINFO['Jw_Type']= u'社会人士' if data[2]==0 else u'应届毕业生'
-	JWINFO['Jw_Action']=data[3]
-	JWINFO['Jw_IndustryJob']=data[4]
-	JWINFO['Res_Sex']=u'男' if data[5]==1 else u'女'
-	JWINFO['Res_birthday']=data[6].strftime('%Y-%m-%d')
-	JWINFO['Age']=CalculateAge(data[6])
-	JWINFO['Res_Height']=data[7]
-	JWINFO['Res_Marry']= u'未婚' if data[8]==0 else u'已婚'
-	JWINFO['Res_Learn']=data[9]
-	JWINFO['Res_GSchool']=data[10]
-	JWINFO['Res_Major']=data[11]
-	JWINFO['Res_English']=data[12] if data[12]!=None else u'——'
-	JWINFO['Res_Hukou']=data[13]
-	JWINFO['Res_Livin']=data[14]
-	JWINFO['Res_Comp_Ability']=data[15]
-	JWINFO['Res_Expr_Years']=data[16]
-	JWINFO['Res_Has_Picture']=data[17]
-	JWINFO['Res_SN']=data[18]
-	JWINFO['Jw_CreditPoint']=data[19]
+		if JWINFO[data[0]]['Res_Learn']=='0':
+			JWINFO[data[0]]['Res_Learn']=u'无'
+		else:
+			JWINFO[data[0]]['Res_Learn']=lx_ICode_IName[15][ JWINFO[data[0]]['Res_Learn'] ]
 
-	if JWINFO['Res_Learn']==0:
-		JWINFO['Res_Learn']=u'无'
-	else:
-		sql="SELECT [IName]     \
-	  FROM [AnalysisData].[dbo].[List_Down] \
-	  where ICode='%s' and lx='15'" % (JWINFO['Res_Learn'])
-		result=DBQuery(sql)
-		data=result[0]
-		JWINFO['Res_Learn']=data[0]
+		JWINFO[data[0]]['Res_Expr_Years']=lx_ICode_IName[14][ JWINFO[data[0]]['Res_Expr_Years'] ]
 
-	sql="SELECT [IName]     \
-  FROM [AnalysisData].[dbo].[List_Down] \
-  where ICode='%s' and lx='14'" % (JWINFO['Res_Expr_Years'])
-	result=DBQuery(sql)
-	data=result[0]
-	JWINFO['Res_Expr_Years']=data[0]
+		if JWINFO[data[0]]['Res_SN']==0:
+			JWINFO[data[0]]['Res_Publish_Date']=u'——'
+			JWINFO[data[0]]['Res_Edu_Trade']=u'——'
+			JWINFO[data[0]]['Res_Ability']=u'——'
+			JWINFO[data[0]]['Res_Dir']=u'——'
+			JWINFO[data[0]]['Res_Job_Want']=u'——'
+			JWINFO[data[0]]['Res_Self_Intro']=u'——'
+			JWINFO[data[0]]['Res_Money']=u'——'
+			JWINFO[data[0]]['Res_JobType1']=u'——'
+			JWINFO[data[0]]['Res_JobType2']=u'——'
+			JWINFO[data[0]]['Res_JobType3']=u'——'
+			JWINFO[data[0]]['Res_Jobkind']=u'——'
+			JWINFO[data[0]]['Res_Workcity1']=u'——'
+			JWINFO[data[0]]['Res_Workcity2']=u'——'
+			JWINFO[data[0]]['Res_Workcity3']=u'——'
+		else:
+			JWINFO[data[0]]['Res_Publish_Date']=RESUME[ JWINFO[data[0]]['Res_SN'] ]['Res_Publish_Date']
+			JWINFO[data[0]]['Res_Edu_Trade']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Edu_Trade']
+			JWINFO[data[0]]['Res_Ability']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Ability']
+			JWINFO[data[0]]['Res_Dir']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Dir']
+			JWINFO[data[0]]['Res_Job_Want']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Job_Want']
+			JWINFO[data[0]]['Res_Self_Intro']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Self_Intro']
+			JWINFO[data[0]]['Res_Money']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Money']
+			JWINFO[data[0]]['Res_JobType1']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_JobType1']
+			JWINFO[data[0]]['Res_JobType2']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_JobType2']
+			JWINFO[data[0]]['Res_JobType3']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_JobType3']
+			JWINFO[data[0]]['Res_Jobkind']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Jobkind']
+			JWINFO[data[0]]['Res_Workcity1']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Workcity1']
+			JWINFO[data[0]]['Res_Workcity2']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Workcity2']
+			JWINFO[data[0]]['Res_Workcity3']=RESUME[JWINFO[data[0]]['Res_SN']]['Res_Workcity3']
 
-	if JWINFO['Res_SN']==0:
-		JWINFO['Res_Publish_Date']=u'——'
-		JWINFO['Res_Edu_Trade']=u'——'
-		JWINFO['Res_Ability']=u'——'
-		JWINFO['Res_Dir']=u'——'
-		JWINFO['Res_Job_Want']=u'——'
-		JWINFO['Res_Self_Intro']=u'——'
-		JWINFO['Res_Money']=u'——'
-		JWINFO['Res_JobType1']=u'——'
-		JWINFO['Res_JobType2']=u'——'
-		JWINFO['Res_JobType3']=u'——'
-		JWINFO['Res_Jobkind']=u'——'
-		JWINFO['Res_Workcity1']=u'——'
-		JWINFO['Res_Workcity2']=u'——'
-		JWINFO['Res_Workcity3']=u'——'
-		return JWINFO
+			if JWINFO[data[0]]['Res_JobType1']!=0:
+				JWINFO[data[0]]['Res_JobType1']=Jobtype[ JWINFO[data[0]]['Res_JobType1'] ]
 
-	sql="SELECT * \
-  FROM [AnalysisData].[dbo].[RESUME] \
-  where [Res_SN]='%s'" % (JWINFO['Res_SN'])
-	result=DBQuery(sql)
-	data=result[0]
-	JWINFO['Res_Publish_Date']=data[1]
-	JWINFO['Res_Edu_Trade']=data[2]
-	JWINFO['Res_Ability']=data[3]
-	JWINFO['Res_Dir']=data[4]
-	JWINFO['Res_Job_Want']=data[5]
-	JWINFO['Res_Self_Intro']=data[6]
-	JWINFO['Res_Money']=data[7]
-	JWINFO['Res_JobType1']=data[8]
-	JWINFO['Res_JobType2']=data[9]
-	JWINFO['Res_JobType3']=data[10]
-	JWINFO['Res_Jobkind']=data[11]
-	JWINFO['Res_Workcity1']=data[12]
-	JWINFO['Res_Workcity2']=data[13]
-	JWINFO['Res_Workcity3']=data[14]
+			if JWINFO[data[0]]['Res_JobType2']!=0:
+				JWINFO[data[0]]['Res_JobType2']=Jobtype[ JWINFO[data[0]]['Res_JobType2'] ]
 
-	if JWINFO['Res_JobType1']!=0:
-		sql="SELECT [name] \
-	 FROM [AnalysisData].[dbo].[Jobtype] \
-	 where [uid]='%s'" % (JWINFO['Res_JobType1'])
-		result=DBQuery(sql)
-		data=result[0]
-		JWINFO['Res_JobType1']=data[0]
+			if JWINFO[data[0]]['Res_JobType3']!=0:
+				JWINFO[data[0]]['Res_JobType3']=Jobtype[ JWINFO[data[0]]['Res_JobType3'] ]
 
-	if JWINFO['Res_JobType2']!=0:
-		sql="SELECT [name] \
-	 FROM [AnalysisData].[dbo].[Jobtype] \
-	 where [uid]='%s'" % (JWINFO['Res_JobType2'])
-		result=DBQuery(sql)
-		data=result[0]
-		JWINFO['Res_JobType2']=data[0]
-
-	if JWINFO['Res_JobType3']!=0:
-		sql="SELECT [name] \
-	 FROM [AnalysisData].[dbo].[Jobtype] \
-	 where [uid]='%s'" % (JWINFO['Res_JobType3'])
-		result=DBQuery(sql)
-		data=result[0]
-		JWINFO['Res_JobType3']=data[0]
-	
-	if JWINFO['Res_Money']==0:
-		JWINFO['Res_Money']=u'——'
-	else:
-		sql="SELECT [IName]    \
-		FROM [AnalysisData].[dbo].[List_Down] \
-		where ICode='%s' and lx='6'" % (JWINFO['Res_Money'])
-		result=DBQuery(sql)
-		data=result[0]
-		JWINFO['Res_Money']=data[0]
+			if JWINFO[data[0]]['Res_Money']=='0':
+				JWINFO[data[0]]['Res_Money']=u'——'
+			else:
+				JWINFO[data[0]]['Res_Money']=lx_ICode_IName[6][ JWINFO[data[0]]['Res_Money'] ]
 
 	return JWINFO
 
 #获取职位信息
-def getJOBINFO(i):
-	JOBINFO=dict()
-	
-	sql="SELECT * \
-	FROM [AnalysisData].[dbo].[JOB_OFFER] \
-	where Job_SN='%s'" %(i)
+def getJOBINFO():
+
+	lx_ICode_IName={}
+	sql="SELECT [IName]\
+      ,[ICode]\
+      ,[lx]\
+  FROM [AnalysisData].[dbo].[List_Down]"
 	result=DBQuery(sql)
-	data=result[0]
+	for data in result:
+		lx_ICode_IName.setdefault(data[2],{})
+		lx_ICode_IName[data[2]][data[1]]=data[0]
 
-	JOBINFO['Job_SN']=data[0]
-	JOBINFO['Job_Name']=data[1]
-	JOBINFO['Job_Publish_Date']=data[2].strftime('%Y-%m-%d')
-	JOBINFO['Job_People_Count']=data[3]
-	JOBINFO['Job_Workplace']=data[4]
-	JOBINFO['Job_Requirement']=data[5]
-	JOBINFO['Ent_SN']=data[6]
-	JOBINFO['JobType']=data[7]
-	JOBINFO['Job_Money']=data[8]
-	JOBINFO['Job_Learn_Limited']=data[9]
-	if data[10]==0:
-		JOBINFO['Job_Sex']=u'不限'
-	else:
-		JOBINFO['Job_Sex']=u'男' if data[10]==1 else u'女'
+	Jobtype={}
+	sql="SELECT [name] \
+	,[uid]\
+ FROM [AnalysisData].[dbo].[Jobtype]"
+ 	result=DBQuery(sql)
+	for data in result:
+		Jobtype.setdefault(data[1],data[0])
 
-	JOBINFO['Job_ProvideHouse']=data[11]
-	JOBINFO['Job_Kind']=data[12]
-	JOBINFO['Job_Agelowest']=data[13]
-	JOBINFO['Job_Agehighest']=data[14]
-	JOBINFO['Job_Expr_Years']=data[15]
-	JOBINFO['Job_Workplace_Code']=data[16]
-	JOBINFO['Job_Keyword']=data[17]
-	JOBINFO['Resumepipei']=data[18]
-	JOBINFO['BUSWAY']=data[19]
-	JOBINFO['discuss']=data[20]
-	JOBINFO['Job_Medals']=data[21]
-
-	sql="SELECT [Ent_Name] \
+	ENT_INFO={}
+	sql="SELECT [Ent_SN]\
+	  ,[Ent_Name] \
       ,[Ent_Industry] \
       ,[Ent_Property] \
-	FROM [AnalysisData].[dbo].[ENT_INFO_FORM] \
-	where Ent_SN='%s'" % (JOBINFO['Ent_SN'])
+	FROM [AnalysisData].[dbo].[ENT_INFO_FORM]"
 	result=DBQuery(sql)
-	data=result[0]
-	JOBINFO['Ent_Name']=data[0]
-	JOBINFO['Ent_Industry']=data[1]
-	JOBINFO['Ent_Property']=data[2]
+	for data in result:
+		ENT_INFO[data[0]]=[data[1],data[2],data[3]]
 
-	sql="SELECT [name] \
-	 FROM [AnalysisData].[dbo].[Jobtype] \
-	 where [uid]='%s'" % (JOBINFO['JobType'])
+	JOBINFO=dict()
+	sql="SELECT * \
+	FROM [AnalysisData].[dbo].[JOB_OFFER]"
 	result=DBQuery(sql)
-	data=result[0]
-	JOBINFO['JobType']=data[0]
+	for data in result:
+		JOBINFO[data[0]]={}
+		JOBINFO[data[0]]['Job_Name']=data[1]
+		JOBINFO[data[0]]['Job_Publish_Date']=data[2].strftime('%Y-%m-%d')
+		JOBINFO[data[0]]['Job_People_Count']=data[3]
+		JOBINFO[data[0]]['Job_Workplace']=data[4]
+		JOBINFO[data[0]]['Job_Requirement']=data[5]
+		JOBINFO[data[0]]['Ent_SN']=data[6]
+		JOBINFO[data[0]]['JobType']=data[7]
+		JOBINFO[data[0]]['Job_Money']=str(data[8])
+		JOBINFO[data[0]]['Job_Learn_Limited']=str(data[9])
+		if data[10]==0:
+			JOBINFO[data[0]]['Job_Sex']=u'不限'
+		else:
+			JOBINFO[data[0]]['Job_Sex']=u'男' if data[10]==1 else u'女'
 
-	if JOBINFO['Job_Money']==0:
-		JOBINFO['Job_Money']='面议'
-	else:
-		sql="SELECT [IName]    \
-		FROM [AnalysisData].[dbo].[List_Down] \
-		where ICode='%s' and lx='6'" % (JOBINFO['Job_Money'])
-		result=DBQuery(sql)
-		data=result[0]
-		JOBINFO['Job_Money']=data[0]
+		JOBINFO[data[0]]['Job_ProvideHouse']=data[11]
+		JOBINFO[data[0]]['Job_Kind']=data[12]
+		JOBINFO[data[0]]['Job_Agelowest']=data[13]
+		JOBINFO[data[0]]['Job_Agehighest']=data[14]
+		JOBINFO[data[0]]['Job_Expr_Years']=str(data[15])
+		JOBINFO[data[0]]['Job_Workplace_Code']=data[16]
+		JOBINFO[data[0]]['Job_Keyword']=data[17]
+		JOBINFO[data[0]]['Resumepipei']=data[18]
+		JOBINFO[data[0]]['BUSWAY']=data[19]
+		JOBINFO[data[0]]['discuss']=data[20]
+		JOBINFO[data[0]]['Job_Medals']=data[21]
 
-	sql="SELECT [IName]    \
-	FROM [AnalysisData].[dbo].[List_Down] \
-	where ICode='%s' and lx='9'" % (JOBINFO['Job_Learn_Limited'])
-	result=DBQuery(sql)
-	data=result[0]
-	JOBINFO['Job_Learn_Limited']=data[0]
 
-	sql="SELECT [IName]     \
-	FROM [AnalysisData].[dbo].[List_Down] \
-	where ICode='%s' and lx='10'" % (JOBINFO['Job_Expr_Years'])
-	result=DBQuery(sql)
-	data=result[0]
-	JOBINFO['Job_Expr_Years']=data[0]
+		JOBINFO[data[0]]['Ent_Name']=ENT_INFO[JOBINFO[data[0]]['Ent_SN']][0]
+		JOBINFO[data[0]]['Ent_Industry']=ENT_INFO[JOBINFO[data[0]]['Ent_SN']][1]
+		JOBINFO[data[0]]['Ent_Property']=ENT_INFO[JOBINFO[data[0]]['Ent_SN']][2]
+
+		JOBINFO[data[0]]['JobType']=Jobtype[JOBINFO[data[0]]['JobType']]
+
+		if JOBINFO[data[0]]['Job_Money']=='0':
+			JOBINFO[data[0]]['Job_Money']='面议'
+		else:
+			JOBINFO[data[0]]['Job_Money']=lx_ICode_IName[6][ JOBINFO[data[0]]['Job_Money'] ]
+
+		JOBINFO[data[0]]['Job_Learn_Limited']=lx_ICode_IName[9][ JOBINFO[data[0]]['Job_Learn_Limited'] ]
+		JOBINFO[data[0]]['Job_Expr_Years']=lx_ICode_IName[10][ JOBINFO[data[0]]['Job_Expr_Years'] ]
 
 	return JOBINFO
 
 #输出到html
 def formatToHtml(fileName):
+	JOBINFOS=getJOBINFO()
+	JWINFOS=getJWINFO()
 	inPath="result/"
 	outPath="show/"
 	inFile=open(inPath+fileName,'r')
@@ -243,7 +244,7 @@ def formatToHtml(fileName):
 	    <div style='margin-left:20px'>"
 		value=line[:-1].split(',')
 		outFile=open(outPath+str(value[0])+'.html','w')
-		JWINFO=getJWINFO(value[0])
+		JWINFO=JWINFOS[int(value[0])]
 		content+="<h3>基本资料</h3>\
 	    	<table border='1px' cellspacing='0' width='600' >\
 	    		<tr height='30'>\
@@ -292,7 +293,7 @@ def formatToHtml(fileName):
 				,JWINFO['Res_Workcity3'],JWINFO['Res_Jobkind'],JWINFO['Res_Expr_Years']\
 				,JWINFO['Res_Ability'],JWINFO['Res_Self_Intro'])
 		for i in value[1:]:
-			JOBINFO=getJOBINFO(i)
+			JOBINFO=JOBINFOS[int(i)]
 			content+="<h3>推荐职位</h3>\
 			<table border='1px' cellspacing='0' width='600' >\
 	    		<tr height='30'>\
