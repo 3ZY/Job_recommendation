@@ -39,7 +39,7 @@ def jobIfEffect(JWINFO,JOB_OFFER):
 	if JOB_OFFER['Job_Sex']!=JWINFO['Res_Sex'] and JOB_OFFER['Job_Sex']!=0:
 		return 0
 
-	#职位类型
+	#职位种类
 	if JOB_OFFER['Job_Kind']!=JWINFO['Res_Jobkind'] and JWINFO['Res_Jobkind']!=0:
 		return 0
 
@@ -117,6 +117,18 @@ def sex_city_IfEffect(JWINFO,JOB_OFFER):
 		((JOB_OFFER['Job_Workplace_Code']%10000==0 or JWINFO['Res_Workcity1']%10000==0) and (JOB_OFFER['Job_Workplace_Code']/10000==JWINFO['Res_Workcity1']/10000) ) or \
 		((JOB_OFFER['Job_Workplace_Code']%10000==0 or JWINFO['Res_Workcity2']%10000==0) and (JOB_OFFER['Job_Workplace_Code']/10000==JWINFO['Res_Workcity2']/10000) ) or \
 		((JOB_OFFER['Job_Workplace_Code']%10000==0 or JWINFO['Res_Workcity3']%10000==0) and (JOB_OFFER['Job_Workplace_Code']/10000==JWINFO['Res_Workcity3']/10000) ) )==0:
+		return 0
+
+	return 1
+
+def sex_IfEffect(JWINFO,JOB_OFFER):
+
+	#数据库未设有效期
+	# if JOB_OFFER['Job_effect']==0:
+	# 	#return 0
+
+	#性别限制
+	if JOB_OFFER['Job_Sex']!=JWINFO['Res_Sex'] and JOB_OFFER['Job_Sex']!=0:
 		return 0
 
 	return 1

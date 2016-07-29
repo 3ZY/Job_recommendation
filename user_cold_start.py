@@ -9,7 +9,7 @@ import math
 import operator
 
 
-#获得最新一个月内行为数不为0的N(i)，N(i)是对职位i发生过行为的用户数
+#获得时间段内行为数不为0的N(i)，N(i)是对职位i发生过行为的用户数
 def getNi(nowtime,lastmonth):
 
 	# sql得出N(i)
@@ -99,7 +99,7 @@ def CB_fill_finallyRecommend(Jw_SN,Job_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_N
 				continue
 			if city_tpye_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
 				count-=1
-				finallyRecommend[u][i]=0.005
+				finallyRecommend[u][i]=0.004
 			if count==0:
 				break
 
@@ -108,10 +108,23 @@ def CB_fill_finallyRecommend(Jw_SN,Job_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_N
 		if alreadyRecommendNum>=R_Num:
 			continue
 		count=R_Num-alreadyRecommendNum#推荐职位数
-		for i,ni in sorted(Ni.items(),key=operator.itemgetter(1),reverse=True):
+		for i in Job_SN:
 			if i in finallyRecommend[u]:#已推荐过
 				continue
 			if sex_city_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
+				count-=1
+				finallyRecommend[u][i]=0.002
+			if count==0:
+				break
+
+		alreadyRecommendNum=len(finallyRecommend[u])#已经推荐数
+		if alreadyRecommendNum>=R_Num:
+			continue
+		count=R_Num-alreadyRecommendNum#推荐职位数
+		for i,ni in sorted(Ni.items(),key=operator.itemgetter(1),reverse=True):
+			if i in finallyRecommend[u]:#已推荐过
+				continue
+			if sex_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
 				count-=1
 				finallyRecommend[u][i]=0.001
 			if count==0:

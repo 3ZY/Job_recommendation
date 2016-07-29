@@ -71,4 +71,4 @@ if __name__ == '__main__':
 	print u"耗时: %f s" % (end - start)
 
 	#html显示结果
-	# formatToHtml('finallyRecommend.csv')
+	formatToHtml('finallyRecommend.csv')

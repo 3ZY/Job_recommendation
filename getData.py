@@ -203,12 +203,13 @@ def getAllJw_SN():
  		Jw_SN.append(data[0])
  	return Jw_SN
 
-#获得最新一个月内所有职位
+#获得时间段内所有职位
 def getAllJob_SN(nowtime,lastmonth):
 
-	sql="SELECT distinct Job_SN \
+	sql="SELECT Job_SN \
 	from [AnalysisData].[dbo].[JOB_OFFER] \
-	where Job_Publish_Date between '%s' and '%s'"\
+	where Job_Publish_Date between '%s' and '%s' \
+	order by Job_Publish_Date desc"\
 	% (lastmonth,nowtime)
 	allJob_SN=list()
 	result=DBQuery(sql)
