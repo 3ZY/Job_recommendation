@@ -8,48 +8,6 @@ from getData import *
 import math
 import operator
 
-
-#获得时间段内行为数不为0的N(i)，N(i)是对职位i发生过行为的用户数
-def getNi(nowtime,lastmonth):
-
-	# sql得出N(i)
-	sql="SELECT count(distinct [Jw_SN]) as num\
-				,[Job_SN]\
-		from \
-		(\
-		select [Jw_SN]\
-		      ,a.[Job_SN]\
-		from \
-		(\
-		SELECT [Jw_SN]\
-		      ,[Job_SN]\
-		  FROM [AnalysisData].[dbo].[JOB_FAV]\
-		union all\
-		SELECT [Jw_SN]\
-		      ,[Job_SN]\
-		  FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
-		union all\
-		SELECT [Jw_SN]\
-		      ,[Job_SN]\
-		  FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
-		) a \
-		join \
-		(\
-		SELECT [Job_SN]\
-		      ,[Job_Publish_Date]\
-		  FROM [AnalysisData].[dbo].[JOB_OFFER]\
-		  where Job_Publish_Date between '%s' and '%s' \
-		)b on b.[Job_SN]=a.Job_SN\
-		) tmp\
-		group by [Job_SN] " \
-		% (lastmonth,nowtime)
-
-	result=DBQuery(sql)
-	Ni=dict()
-	for data in result:
-		Ni[data[1]]=data[0]
-	return Ni
-
 # most_popular推荐结果
 def most_popular_finallyRecommend(Jw_SN,nowtime,lastmonth,JWINFO,JOB_OFFER,R_Num=8,finallyRecommend={}):
 	Ni=getNi(nowtime,lastmonth)
