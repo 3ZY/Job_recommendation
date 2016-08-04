@@ -20,7 +20,7 @@ def job_match(JWINFO,JOB_OFFER):
         return 4
 
 #绘制图表
-def show_plot(fileName,R_Num=8):
+def show_plot(fileName,R_Num=10):
     inPath="result/"
     nowtime,lastmonth=getTimes()
     nowtime='2016-7-28'
@@ -38,11 +38,11 @@ def show_plot(fileName,R_Num=8):
     inFile.readline()
     for line in inFile.readlines():
         values=line[:-1].split(',')
-        total_rec+=R_Num
-        match_1=len( [x for x in values[1:] if job_match(JWINFOS[int(values[0])],JOB_OFFERS[int(x)])==1 ])
-        match_2=len( [x for x in values[1:] if job_match(JWINFOS[int(values[0])],JOB_OFFERS[int(x)])==2 ])
-        match_3=len( [x for x in values[1:] if job_match(JWINFOS[int(values[0])],JOB_OFFERS[int(x)])==3 ])
-        match_4=len( [x for x in values[1:] if job_match(JWINFOS[int(values[0])],JOB_OFFERS[int(x)])==4 ])
+        total_rec+=R_Num #只分析前R_Num个职位
+        match_1=len( [x for x in values[1:R_Num+1] if job_match(JWINFOS[int(values[0])],JOB_OFFERS[int(x)])==1 ])
+        match_2=len( [x for x in values[1:R_Num+1] if job_match(JWINFOS[int(values[0])],JOB_OFFERS[int(x)])==2 ])
+        match_3=len( [x for x in values[1:R_Num+1] if job_match(JWINFOS[int(values[0])],JOB_OFFERS[int(x)])==3 ])
+        match_4=len( [x for x in values[1:R_Num+1] if job_match(JWINFOS[int(values[0])],JOB_OFFERS[int(x)])==4 ])
         total_1+=match_1
         total_2+=match_2
         total_3+=match_3
@@ -72,7 +72,7 @@ def show_plot(fileName,R_Num=8):
         Y.append(tmp)
     X=np.arange(1,len(labels)+1)
     Y=np.array(Y)*100
-    width=0.1
+    width=0.085
     rects=[]
     rect_colors= [np.random.rand(3) for _ in range(R_Num+1)] # 创建随机颜色
     for i in range(R_Num+1):
@@ -139,6 +139,37 @@ def show_plot(fileName,R_Num=8):
             outstr="<a href='%s.html' target='_blank'>%s</a></br>\n" % (jw,jw)
             outFile.write(outstr)
         i+=1
+
+    # ---- 完全匹配分布 --------
+    cir_colors= [np.random.rand(3) for _ in range(R_Num+1)] # 创建随机颜色
+    tmp=[]
+    #非完全匹配职位来自
+    for i in range(R_Num+1):
+        if i !=R_Num:
+            fig = plt.figure(figsize=(9,6))
+            ax = fig.gca()
+            tmp.append( sum([1 for key,value in Jw_match.items() if value[0]==i]) )
+        else:
+            tmp.append( sum([1 for key,value in Jw_match.items() if value[0]==i])/total_Jw )
+            break
+        goal=[value for key,value in Jw_match.items() if value[0]==i]
+        type1=sum([value[1] for value in goal])#性别城市职位
+        type2=sum([value[2] for value in goal])#性别城市
+        type3=sum([value[3] for value in goal])#性别城市
+        sizes=[ type1/tmp[i],type2/tmp[i],type3/tmp[i] ]
+        explo = (0, 0, 0)
+        ax.pie(sizes, explode=explo, labels=labels[1:], colors=colors[1:],autopct='%1.2f%%', shadow=True, startangle=90)
+        ax.axis('equal')
+        ax.text(-1.4,1,u'完全匹配职位数: '+str(i))
+        tmp[i]/=total_Jw
+    #用户分布:
+    fig=plt.figure(figsize=(9,6))
+    ax=fig.gca()
+    sizes=tmp
+    cir_labels=[i for i in range(R_Num+1)]
+    ax.pie(sizes,labels=cir_labels,colors=cir_colors,autopct='%1.2f%%',shadow=True,startangle=90)
+    ax.axis('equal')
+    ax.text(-1.4,1,u'完全匹配')
 
     # -------- show -----------------
     plt.show()

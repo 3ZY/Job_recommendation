@@ -55,18 +55,17 @@ def itemCF_IUF_Recommend(user,train,W):
 	return rank
 
 #itemCF-IUF推荐结果
-def itemCF_IUF_finallyRecommend(train,JWINFO,JOB_OFFER,R_Num=8,finallyRecommend={}):
+def itemCF_IUF_finallyRecommend(train,JWINFO,JOB_OFFER,R_Num=10,finallyRecommend={}):
 	W=ItemSimilarity(train)
 	for u in train.keys():
 		if u not in JWINFO:
 			continue
 		finallyRecommend.setdefault(u,{})
-		#第一次严格过滤
 		alreadyRecommendNum=len(finallyRecommend[u])#已经推荐数
-		if alreadyRecommendNum>=R_Num:
+		if alreadyRecommendNum>=R_Num*3:
 			continue
 		u_recommend=itemCF_IUF_Recommend(u,train,W) #求职者u的推荐集合
-		count=R_Num-alreadyRecommendNum#推荐职位数
+		count=R_Num*3-alreadyRecommendNum#推荐职位数
 		for i,pui in sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True):
 			if i in finallyRecommend[u]:#已推荐过
 				continue
@@ -78,20 +77,5 @@ def itemCF_IUF_finallyRecommend(train,JWINFO,JOB_OFFER,R_Num=8,finallyRecommend=
 				finallyRecommend[u][i]=pui
 			if count==0:
 				break
-		#规则过滤期望城市，期望工作，性别
-		alreadyRecommendNum=len(finallyRecommend[u])#已经推荐数
-		if alreadyRecommendNum>=R_Num:
-			continue
-		count=R_Num-alreadyRecommendNum#推荐职位数
-		for i,pui in sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True):
-			if i in finallyRecommend[u]:#已推荐过
-				continue
-			if i not in JOB_OFFER:
-				continue
-			#规则过滤期望城市，期望工作，性别
-			if city_tpye_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
-				count-=1
-				finallyRecommend[u][i]=pui
-			if count==0:
-				break
+
 	return finallyRecommend
