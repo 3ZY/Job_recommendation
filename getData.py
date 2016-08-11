@@ -50,10 +50,8 @@ def getTrainData(nowtime,lastime,outStr={}):
 	sql="SELECT [Jw_SN]\
 			,[Job_SN]\
 		FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
-		WHERE VDate between '%s' and '%s' \
-		and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
-		[Job_Publish_Date] between '%s' and '%s')" \
-		% (lastime,nowtime,lastime,nowtime)
+		WHERE VDate between '%s' and '%s' " \
+		% (lastime,nowtime)
 
 
 	result=DBQuery(sql)
@@ -67,10 +65,8 @@ def getTrainData(nowtime,lastime,outStr={}):
 	sql="SELECT [Jw_SN]\
 			,[Job_SN]\
 		FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
-		WHERE Apply_Date between '%s' and '%s' \
-		and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
-		[Job_Publish_Date] between '%s' and '%s')" \
-		% (lastime,nowtime,lastime,nowtime)
+		WHERE Apply_Date between '%s' and '%s' " \
+		% (lastime,nowtime)
 
 	result=DBQuery(sql)
 	outStr['JWAPPLYJOB']= u"%d 条" % len(result)
@@ -83,10 +79,8 @@ def getTrainData(nowtime,lastime,outStr={}):
 	sql="SELECT [Jw_SN]\
 			,[Job_SN]\
 		FROM [AnalysisData].[dbo].[JOB_FAV]\
-		WHERE Add_Date between '%s' and '%s' \
-		and [Job_SN] in (select [Job_SN] from [AnalysisData].[dbo].[JOB_OFFER] where \
-		[Job_Publish_Date] between '%s' and '%s')" \
-		% (lastime,nowtime,lastime,nowtime)
+		WHERE Add_Date between '%s' and '%s' " \
+		% (lastime,nowtime)
 
 	result=DBQuery(sql)
 	outStr['JOB_FAV']=u"%d 条" % len(result)
@@ -101,7 +95,7 @@ def getTrainData(nowtime,lastime,outStr={}):
 def getNi(nowtime,lastime):
 
 	# sql得出N(i)
-	sql="SELECT count(distinct [Jw_SN]) as num\
+	sql="SELECT top 20000 count(distinct [Jw_SN]) as num\
 				,[Job_SN]\
 		from \
 		(\
@@ -129,7 +123,7 @@ def getNi(nowtime,lastime):
 		  where Job_Publish_Date between '%s' and '%s' \
 		)b on b.[Job_SN]=a.Job_SN \
 		) tmp\
-		group by [Job_SN] " \
+		group by [Job_SN] order by num desc " \
 		% (lastime,nowtime)
 
 	result=DBQuery(sql)
@@ -152,7 +146,21 @@ def getJWJOBINFO(nowtime,lastime,outStr={}):
 			,[Res_Workcity1]\
 			,[Res_Workcity2]\
 			,[Res_Workcity3]\
-			FROM [AnalysisData].[dbo].[RESUME]"
+            ,[Jw_SN]\
+		FROM [AnalysisData].[dbo].[RESUME] \
+        where [Jw_SN] in \
+            (SELECT [Jw_SN]\
+        	  FROM [AnalysisData].[dbo].[JOB_FAV]\
+        	  WHERE Add_Date between '%s' and '%s'\
+        	union all\
+        	SELECT [Jw_SN]\
+        	  FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
+        	  WHERE VDate between '%s' and '%s'\
+        	union all\
+        	SELECT [Jw_SN]\
+        	  FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
+        	  WHERE Apply_Date between '%s' and '%s' ) " \
+              % (lastime,nowtime,lastime,nowtime,lastime,nowtime)
 	result=DBQuery(sql)
 	outStr['RESUME']=u"%d 条" % len(result)
 	for data in result:
@@ -173,7 +181,20 @@ def getJWJOBINFO(nowtime,lastime,outStr={}):
 		,[Res_Learn]\
 		,[Res_Expr_Years]\
 		,[Res_SN]\
-		from [AnalysisData].[dbo].[JWINFO]"
+		from [AnalysisData].[dbo].[JWINFO] \
+        where [Jw_SN] in \
+            (SELECT [Jw_SN]\
+        	  FROM [AnalysisData].[dbo].[JOB_FAV]\
+        	  WHERE Add_Date between '%s' and '%s'\
+        	union all\
+        	SELECT [Jw_SN]\
+        	  FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
+        	  WHERE VDate between '%s' and '%s'\
+        	union all\
+        	SELECT [Jw_SN]\
+        	  FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
+        	  WHERE Apply_Date between '%s' and '%s' ) " \
+              % (lastime,nowtime,lastime,nowtime,lastime,nowtime)
 	result=DBQuery(sql)
 	outStr['JWINFO']=u"%d 条" % len(result)
 	for data in result:

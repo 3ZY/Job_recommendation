@@ -63,7 +63,7 @@ def show_plot(fileName,R_Num=10):
     ax = fig.gca()
     X=[]
     Y=[]
-    for i in range(R_Num+1):
+    for i in xrange(R_Num+1):
         tmp=[]
         tmp.append(sum([1 for key,value in Jw_match.items() if value[0]==i])/total_Jw)
         tmp.append(sum([1 for key,value in Jw_match.items() if value[1]==i])/total_Jw)
@@ -75,7 +75,7 @@ def show_plot(fileName,R_Num=10):
     width=0.085
     rects=[]
     rect_colors= [np.random.rand(3) for _ in range(R_Num+1)] # 创建随机颜色
-    for i in range(R_Num+1):
+    for i in xrange(R_Num+1):
         rects.append(ax.bar(X+i*width,Y[i],width=width,color=rect_colors[i],edgecolor='white') )
         for x,y in zip(X,Y[i]):
             ax.text(x-0.05+(width)*(i+1),y+0.05,'%.1f' % y, ha='center', va='bottom')
@@ -92,7 +92,7 @@ def show_plot(fileName,R_Num=10):
     for value,match in Jw_match.items():
         if match not in jw_type:
             jw_type.append(match)
-    for i in range(len(labels)):
+    for i in xrange(len(labels)):
         jw_type=sorted(jw_type,key=lambda x:x[len(labels)-i-1],reverse=True)
 
     percent=[]#用户比例
@@ -102,7 +102,7 @@ def show_plot(fileName,R_Num=10):
     width=0.8
     Num=20 #每个窗口显示Num个
     count=int( (len(jw_type)+Num-1)/Num ) #窗口个数
-    for v in range(count):
+    for v in xrange(count):
         fig = plt.figure(figsize=(18,8))
         ax = fig.gca()
         tmp=np.array(jw_type[Num*v:Num*(v+1)]).T
@@ -110,11 +110,11 @@ def show_plot(fileName,R_Num=10):
         X=np.arange(x_num)+0.1
         bottom=np.zeros(x_num)
         rects=[]
-        for i in range(len(labels)):
+        for i in xrange(len(labels)):
             rects.append(ax.bar(X,tmp[i],width,color=colors[i],edgecolor='white',bottom=bottom) )
             bottom+=tmp[i]
 
-        for i in range(x_num):
+        for i in xrange(x_num):
             ax.text(X[i]+width/2,R_Num+0.05,'%.2f' % percent[i+Num*v], ha='center', va='bottom')
 
         ax.set_title(u'用户分布')
@@ -144,7 +144,7 @@ def show_plot(fileName,R_Num=10):
     cir_colors= [np.random.rand(3) for _ in range(R_Num+1)] # 创建随机颜色
     tmp=[]
     #非完全匹配职位来自
-    for i in range(R_Num+1):
+    for i in xrange(R_Num+1):
         if i !=R_Num:
             fig = plt.figure(figsize=(9,6))
             ax = fig.gca()

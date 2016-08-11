@@ -19,6 +19,8 @@ def most_popular_finallyRecommend(train,Jw_SN,nowtime,lastime,JWINFO,JOB_OFFER,N
 		for i,ni in sorted(Ni.items(),key=operator.itemgetter(1),reverse=True):
 			if i in interacted_items:#过滤求职者浏览、应聘、收藏过的职位
 				continue
+			if i not in JOB_OFFER:
+				continue
 			if i in finallyRecommend[u]:#已推荐过
 				continue
 			#规则过滤 性别不符、学历不符等
@@ -80,6 +82,8 @@ def CB_fill_finallyRecommend(Jw_SN,Job_SN,nowtime,lastime,JWINFO,JOB_OFFER,Ni,R_
 		count=R_Num-alreadyRecommendNum#推荐职位数
 		for i,ni in sorted(Ni.items(),key=operator.itemgetter(1),reverse=True):
 			if i in finallyRecommend[u]:#已推荐过
+				continue
+			if i not in JOB_OFFER:
 				continue
 			if sex_IfEffect(JWINFO[u],JOB_OFFER[i])==1:
 				count-=1

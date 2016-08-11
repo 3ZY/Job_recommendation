@@ -3,7 +3,6 @@
 #主函数
 from __future__ import division
 from getData import *
-from itemCF_IUF import itemCF_IUF_finallyRecommend
 from userCF_IIF import userCF_IIF_finallyRecommend
 from evaluate import *
 from user_cold_start import *
@@ -17,24 +16,25 @@ import traceback
 if __name__ == '__main__':
 
 	outStr={'getData':u'——','evaluate':u'——','userCF_IIF':u'——', \
-			'itemCF_IUF':u'——','most_popular':u'——','CB_fill':u'——', \
+			'most_popular':u'——','CB_fill':u'——', \
 			'outToDB':u'——','total':u'——','JW_QUERY_LOG':u'——',\
 			'JWAPPLYJOB':u'——','JOB_FAV':u'——','RESUME':u'——',\
 			'JWINFO':u'——','JOB_OFFER':u'——'}#日志输出部分
 	errStr="none" #出错信息
 	try:
 		start = time.clock()
-		nowtime,lastime=getTimes(68)#前30天
-		# nowtime='2016-7-28'
-		# lastime='2016-6-1'
+		nowtime,lastime=getTimes(30)#前n天
+		nowtime='2016-7-28'
+		lastime='2016-6-1'
 		R_Num=10 #推荐职位数
 		#获取数据
 		Job_Rec=getJob_Rec()
 		Job_SN=getAllJob_SN(nowtime,lastime)#时间段内所有职位
-		Jw_SN=getAllJw_SN()#获得所有求职者
+		# Jw_SN=getAllJw_SN()#获得所有求职者
 		JWINFO,JOB_OFFER=getJWJOBINFO(nowtime,lastime,outStr)#获得求职者信息及职位信息
 		Ni=getNi(nowtime,lastime)
 		trainData=getTrainData(nowtime,lastime,outStr)#行为数据
+		Jw_SN=set(JWINFO.keys())
 
 		getData_time=time.clock()
 		outStr['getData']=u"耗时: %f s" % (getData_time - start)
@@ -53,17 +53,11 @@ if __name__ == '__main__':
 		outStr['userCF_IIF']=u"耗时: %f s" % (userCF_IIF_time - evaluate_time)
 		print u"userCF_IIF耗时: %f s" % (userCF_IIF_time - evaluate_time)
 
-		#itemCF_IUF推荐
-		finallyRecommend=itemCF_IUF_finallyRecommend(trainData,JWINFO,JOB_OFFER,R_Num,finallyRecommend)
-		itemCF_IUF_time=time.clock()
-		outStr['itemCF_IUF']=u"耗时: %f s" % (itemCF_IUF_time - userCF_IIF_time)
-		print u"itemCF_IUF耗时: %f s" % (itemCF_IUF_time - userCF_IIF_time)
-
 		#most_popular推荐
 		finallyRecommend=most_popular_finallyRecommend(trainData,Jw_SN,nowtime,lastime,JWINFO,JOB_OFFER,Ni,R_Num,finallyRecommend)
 		most_popular_time=time.clock()
-		outStr['most_popular']=u"耗时: %f s" % (most_popular_time - itemCF_IUF_time)
-		print u"most_popular耗时: %f s" % (most_popular_time - itemCF_IUF_time)
+		outStr['most_popular']=u"耗时: %f s" % (most_popular_time - userCF_IIF_time)
+		print u"most_popular耗时: %f s" % (most_popular_time - userCF_IIF_time)
 
 		del trainData#训练数据释放
 
@@ -74,7 +68,7 @@ if __name__ == '__main__':
 		print u"CB_fill耗时: %f s" % (CB_fill_time - most_popular_time)
 
 		#结果输出到文件
-		outToFile('finallyRecommend.csv',finallyRecommend)
+		#outToFile('finallyRecommend.csv',finallyRecommend)
 
 		#结果输出到数据库
 		outToDB(finallyRecommend)
@@ -95,4 +89,4 @@ if __name__ == '__main__':
 		print key,value
 
 	#html显示结果
-	formatToHtml('finallyRecommend.csv')
+	#formatToHtml('finallyRecommend.csv')

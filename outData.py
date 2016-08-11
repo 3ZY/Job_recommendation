@@ -20,12 +20,12 @@ def log_out(nowtime,errStr,outStr):
 	sql="insert into [AnalysisData].[dbo].[Rec_log] \
       	([log_time],[JW_QUERY_LOG] ,[JWAPPLYJOB] ,[JOB_FAV] ,[RESUME] \
 		,[JWINFO] ,[JOB_OFFER] ,[getData] ,[evaluate] \
-		,[userCF_IIF] ,[itemCF_IUF] ,[most_popular] \
+		,[userCF_IIF] ,[most_popular] \
 		,[CB_fill] ,[outToDB] ,[total] ,[err]) \
-	  	values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" \
+	  	values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" \
 	  	% (nowtime,outStr['JW_QUERY_LOG'], outStr['JWAPPLYJOB'], outStr['JOB_FAV'], \
 			outStr['RESUME'], outStr['JWINFO'], outStr['JOB_OFFER'], outStr['getData'], \
-			outStr['evaluate'], outStr['userCF_IIF'], outStr['itemCF_IUF'], \
+			outStr['evaluate'], outStr['userCF_IIF'], \
 			outStr['most_popular'], outStr['CB_fill'], outStr['outToDB'], \
 			outStr['total'], errStr.replace("'",u"''"))
 	DBInsert(sql)
