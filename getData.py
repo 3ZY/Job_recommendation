@@ -49,7 +49,7 @@ def getTrainData(nowtime,lastime,outStr={}):
 	#JW_QUERY_LOG
 	sql="SELECT [Jw_SN]\
 			,[Job_SN]\
-		FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
+		FROM [dbo].[JW_QUERY_LOG]\
 		WHERE VDate between '%s' and '%s' " \
 		% (lastime,nowtime)
 
@@ -64,7 +64,7 @@ def getTrainData(nowtime,lastime,outStr={}):
 	#JWAPPLYJOB
 	sql="SELECT [Jw_SN]\
 			,[Job_SN]\
-		FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
+		FROM [dbo].[JWAPPLYJOB]\
 		WHERE Apply_Date between '%s' and '%s' " \
 		% (lastime,nowtime)
 
@@ -78,7 +78,7 @@ def getTrainData(nowtime,lastime,outStr={}):
 	#JOB_FAV
 	sql="SELECT [Jw_SN]\
 			,[Job_SN]\
-		FROM [AnalysisData].[dbo].[JOB_FAV]\
+		FROM [dbo].[JOB_FAV]\
 		WHERE Add_Date between '%s' and '%s' " \
 		% (lastime,nowtime)
 
@@ -105,21 +105,21 @@ def getNi(nowtime,lastime):
 		(\
 		SELECT [Jw_SN]\
 		      ,[Job_SN]\
-		  FROM [AnalysisData].[dbo].[JOB_FAV]\
+		  FROM [dbo].[JOB_FAV]\
 		union all\
 		SELECT [Jw_SN]\
 		      ,[Job_SN]\
-		  FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
+		  FROM [dbo].[JW_QUERY_LOG]\
 		union all\
 		SELECT [Jw_SN]\
 		      ,[Job_SN]\
-		  FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
+		  FROM [dbo].[JWAPPLYJOB]\
 		) a \
 		join \
 		(\
 		SELECT [Job_SN]\
 		      ,[Job_Publish_Date]\
-		  FROM [AnalysisData].[dbo].[JOB_OFFER]\
+		  FROM [dbo].[JOB_OFFER]\
 		  where Job_Publish_Date between '%s' and '%s' \
 		)b on b.[Job_SN]=a.Job_SN \
 		) tmp\
@@ -147,18 +147,18 @@ def getJWJOBINFO(nowtime,lastime,outStr={}):
 			,[Res_Workcity2]\
 			,[Res_Workcity3]\
             ,[Jw_SN]\
-		FROM [AnalysisData].[dbo].[RESUME] \
+		FROM [dbo].[RESUME] \
         where [Jw_SN] in \
             (SELECT [Jw_SN]\
-        	  FROM [AnalysisData].[dbo].[JOB_FAV]\
+        	  FROM [dbo].[JOB_FAV]\
         	  WHERE Add_Date between '%s' and '%s'\
         	union all\
         	SELECT [Jw_SN]\
-        	  FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
+        	  FROM [dbo].[JW_QUERY_LOG]\
         	  WHERE VDate between '%s' and '%s'\
         	union all\
         	SELECT [Jw_SN]\
-        	  FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
+        	  FROM [dbo].[JWAPPLYJOB]\
         	  WHERE Apply_Date between '%s' and '%s' ) " \
               % (lastime,nowtime,lastime,nowtime,lastime,nowtime)
 	result=DBQuery(sql)
@@ -181,18 +181,18 @@ def getJWJOBINFO(nowtime,lastime,outStr={}):
 		,[Res_Learn]\
 		,[Res_Expr_Years]\
 		,[Res_SN]\
-		from [AnalysisData].[dbo].[JWINFO] \
+		from [dbo].[JWINFO] \
         where [Jw_SN] in \
             (SELECT [Jw_SN]\
-        	  FROM [AnalysisData].[dbo].[JOB_FAV]\
+        	  FROM [dbo].[JOB_FAV]\
         	  WHERE Add_Date between '%s' and '%s'\
         	union all\
         	SELECT [Jw_SN]\
-        	  FROM [AnalysisData].[dbo].[JW_QUERY_LOG]\
+        	  FROM [dbo].[JW_QUERY_LOG]\
         	  WHERE VDate between '%s' and '%s'\
         	union all\
         	SELECT [Jw_SN]\
-        	  FROM [AnalysisData].[dbo].[JWAPPLYJOB]\
+        	  FROM [dbo].[JWAPPLYJOB]\
         	  WHERE Apply_Date between '%s' and '%s' ) " \
               % (lastime,nowtime,lastime,nowtime,lastime,nowtime)
 	result=DBQuery(sql)
@@ -236,7 +236,7 @@ def getJWJOBINFO(nowtime,lastime,outStr={}):
 		,[Job_Agehighest]\
 		,[Job_Expr_Years]\
 		,[Job_Workplace_Code]\
-		FROM [AnalysisData].[dbo].[JOB_OFFER]\
+		FROM [dbo].[JOB_OFFER]\
 		where Job_Publish_Date between '%s' and '%s'"\
 		% (lastime,nowtime)
 	result=DBQuery(sql)
@@ -258,7 +258,7 @@ def getJWJOBINFO(nowtime,lastime,outStr={}):
 #获得所有Jw_SN
 def getAllJw_SN():
 	sql="SELECT [Jw_SN]\
- 	 FROM [AnalysisData].[dbo].[JWINFO]"
+ 	 FROM [dbo].[JWINFO]"
  	result=DBQuery(sql)
  	Jw_SN=list()
  	for data in result:
@@ -269,7 +269,7 @@ def getAllJw_SN():
 def getAllJob_SN(nowtime,lastime):
 
 	sql="SELECT Job_SN \
-	from [AnalysisData].[dbo].[JOB_OFFER] \
+	from [dbo].[JOB_OFFER] \
 	where Job_Publish_Date between '%s' and '%s' \
 	order by Job_Publish_Date desc" \
 	% (lastime,nowtime)
@@ -285,7 +285,7 @@ def getJob_Rec():
 	sql="SELECT [Jw_SN] \
 		,[Job_Rec] \
 		,[Push] \
-		FROM [AnalysisData].[dbo].[Job_Rec]"
+		FROM [dbo].[Job_Rec]"
 	Job_Rec={}
 	result=DBQuery(sql)
 	for data in result:

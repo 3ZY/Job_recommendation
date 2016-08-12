@@ -4,7 +4,8 @@
 from __future__ import division
 from DB import *
 from getData import *
-from outData import outScore
+from outData import outScore,outScoreToFile
+import numpy as np
 
 #得出各用户的Score
 def evaluate(Job_Rec):
@@ -37,7 +38,10 @@ def evaluate(Job_Rec):
         jw_score[jw]=[Precision,Recall,F1]
 
     if jw_score!={}:
-        jw_score['-1']=[ sum([ values[0] for values in jw_score.values() ]) / len(jw_score),\
-                            sum([ values[1] for values in jw_score.values() ]) / len(jw_score),\
-                            sum([ values[2] for values in jw_score.values() ]) / len(jw_score)]
-    outScore(jw_score)
+        jw_mean=np.mean(jw_score.values(),axis=0)
+        jw_std=np.std(jw_score.values(),axis=0)
+        jw_score['-1']=jw_mean.tolist()
+        jw_score['-2']=jw_std.tolist()
+
+        outScoreToFile(jw_score)
+        outScore(jw_score)

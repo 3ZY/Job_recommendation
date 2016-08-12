@@ -3,7 +3,9 @@
 #结果输出
 from __future__ import division
 from DB import *
+from datetime import date
 import operator
+
 #输出推荐结果到文件
 def outToFile(fileName,recommend):
 	path='result/'
@@ -17,7 +19,7 @@ def outToFile(fileName,recommend):
 			outFile.write("\n")
 #输出运行日志
 def log_out(nowtime,errStr,outStr):
-	sql="insert into [AnalysisData].[dbo].[Rec_log] \
+	sql="insert into [dbo].[Rec_log] \
       	([log_time],[JW_QUERY_LOG] ,[JWAPPLYJOB] ,[JOB_FAV] ,[RESUME] \
 		,[JWINFO] ,[JOB_OFFER] ,[getData] ,[evaluate] \
 		,[userCF_IIF] ,[most_popular] \
@@ -32,9 +34,9 @@ def log_out(nowtime,errStr,outStr):
 
 #输出推荐结果到数据库
 def outToDB(recommend):
-	sql="truncate table [AnalysisData].[dbo].[Job_Rec]"
+	sql="truncate table [dbo].[Job_Rec]"
 	DBInsert(sql)
-	sql="insert into [AnalysisData].[dbo].[Job_Rec] ([Jw_SN],[Job_Rec],[Push]) values "
+	sql="insert into [dbo].[Job_Rec] ([Jw_SN],[Job_Rec],[Push]) values "
 	flag=False
 	num=0
 	for u,u_recommend in recommend.items():
@@ -50,16 +52,16 @@ def outToDB(recommend):
 			if num==1000:
 				num=0
 				DBInsert(sql[:-1])
-				sql="insert into [AnalysisData].[dbo].[Job_Rec] ([Jw_SN],[Job_Rec],[Push]) values "
+				sql="insert into [dbo].[Job_Rec] ([Jw_SN],[Job_Rec],[Push]) values "
 				flag=False
 	if flag:
 		DBInsert(sql[:-1])
 
 #输出F1到数据库
 def outScore(jw_score):
-	sql="truncate table [AnalysisData].[dbo].[Rec_F1]"
+	sql="truncate table [dbo].[Rec_F1]"
 	DBInsert(sql)
-	sql="insert into [AnalysisData].[dbo].[Rec_F1] ([Jw_SN],[Precision],[Recall],[F1]) values "
+	sql="insert into [dbo].[Rec_F1] ([Jw_SN],[Precision],[Recall],[F1]) values "
 	flag=False
 	num=0
 	for jw,score in jw_score.items():
@@ -70,7 +72,15 @@ def outScore(jw_score):
 		if num==1000:
 			num=0
 			DBInsert(sql[:-1])
-			sql="insert into [AnalysisData].[dbo].[Rec_F1] ([Jw_SN],[Precision],[Recall],[F1]) values "
+			sql="insert into [dbo].[Rec_F1] ([Jw_SN],[Precision],[Recall],[F1]) values "
 			flag=False
 	if flag:
 		DBInsert(sql[:-1])
+
+#输出F1到文件
+def outScoreToFile(jw_score):
+	nowday=str(date.today())
+	outFile=open('evaluate/%s.csv' % nowday,'w')
+	outFile.write('Jw_SN,Precision,Recall,F1\n')
+	for jw,score in jw_score.items():
+		outFile.write("%s,%s,%s,%s\n" % (str(jw),str(score[0]),str(score[1]),str(score[2])) )

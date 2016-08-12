@@ -24,8 +24,8 @@ if __name__ == '__main__':
 	try:
 		start = time.clock()
 		nowtime,lastime=getTimes(30)#前n天
-		nowtime='2016-7-28'
-		lastime='2016-6-1'
+		# nowtime='2016-7-28'
+		# lastime='2016-6-1'
 		R_Num=10 #推荐职位数
 		#获取数据
 		Job_Rec=getJob_Rec()
@@ -85,8 +85,8 @@ if __name__ == '__main__':
 		print errStr
 
 	log_out(time.strftime("%Y-%m-%d %H:%M:%S"),errStr,outStr)
-	for key,value in outStr.items():
-		print key,value
+	# for key,value in outStr.items():
+	# 	print key,value
 
 	#html显示结果
 	#formatToHtml('finallyRecommend.csv')
