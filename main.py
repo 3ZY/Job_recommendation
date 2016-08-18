@@ -7,13 +7,16 @@ from userCF_IIF import userCF_IIF_finallyRecommend
 from evaluate import *
 from user_cold_start import *
 from outData import *
-from show import formatToHtml
 import math
 import operator
 import time
 import traceback
+import ConfigParser
 
 if __name__ == '__main__':
+
+	conf = ConfigParser.ConfigParser()
+	conf.read("conf.ini")
 
 	outStr={'getData':u'——','evaluate':u'——','userCF_IIF':u'——', \
 			'most_popular':u'——','CB_fill':u'——', \
@@ -23,10 +26,10 @@ if __name__ == '__main__':
 	errStr="none" #出错信息
 	try:
 		start = time.clock()
-		nowtime,lastime=getTimes(30)#前n天
-		# nowtime='2016-7-28'
-		# lastime='2016-6-1'
-		R_Num=10 #推荐职位数
+		nowtime,lastime=getTimes( int(conf.get('base','days')) )#前n天
+		nowtime='2016-7-28'
+		lastime='2016-6-1'
+		R_Num=int(conf.get('base','R_Num')) #推荐职位数
 		#获取数据
 		Job_Rec=getJob_Rec()
 		Job_SN=getAllJob_SN(nowtime,lastime)#时间段内所有职位
@@ -41,14 +44,14 @@ if __name__ == '__main__':
 		print u"getData耗时: %f s" % (getData_time - start)
 
 		#生成评估表
-		evaluate(Job_Rec)
+		evaluate(Job_Rec,conf.get('base','outScoreToFile'))
 		evaluate_time=time.clock()
 		outStr['evaluate']=u"耗时: %f s" % (evaluate_time - getData_time)
 		print u"evaluate耗时: %f s" % (evaluate_time - getData_time)
 		del Job_Rec#历史推荐数据释放
 
 		#userCF_IIF推荐
-		finallyRecommend=userCF_IIF_finallyRecommend(trainData,JWINFO,JOB_OFFER,R_Num)
+		finallyRecommend=userCF_IIF_finallyRecommend(trainData,JWINFO,JOB_OFFER,R_Num,conf.get('base','K'))
 		userCF_IIF_time=time.clock()
 		outStr['userCF_IIF']=u"耗时: %f s" % (userCF_IIF_time - evaluate_time)
 		print u"userCF_IIF耗时: %f s" % (userCF_IIF_time - evaluate_time)
@@ -67,8 +70,9 @@ if __name__ == '__main__':
 		outStr['CB_fill']=u"耗时: %f s" % (CB_fill_time - most_popular_time)
 		print u"CB_fill耗时: %f s" % (CB_fill_time - most_popular_time)
 
-		#结果输出到文件
-		#outToFile('finallyRecommend.csv',finallyRecommend)
+		if conf.get('base','outToFile')=="y":
+			#结果输出到文件
+			outToFile('finallyRecommend.csv',finallyRecommend)
 
 		#结果输出到数据库
 		outToDB(finallyRecommend)
@@ -87,6 +91,3 @@ if __name__ == '__main__':
 	log_out(time.strftime("%Y-%m-%d %H:%M:%S"),errStr,outStr)
 	# for key,value in outStr.items():
 	# 	print key,value
-
-	#html显示结果
-	#formatToHtml('finallyRecommend.csv')

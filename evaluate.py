@@ -8,7 +8,7 @@ from outData import outScore,outScoreToFile
 import numpy as np
 
 #得出各用户的Score
-def evaluate(Job_Rec):
+def evaluate(Job_Rec,flag):
     if Job_Rec=={}:
         return 0
     nowday,lastday=getTimes(1)
@@ -43,5 +43,6 @@ def evaluate(Job_Rec):
         jw_score['-1']=jw_mean.tolist()
         jw_score['-2']=jw_std.tolist()
 
-        outScoreToFile(jw_score)
+        if flag=="y":
+            outScoreToFile(jw_score)
         outScore(jw_score)

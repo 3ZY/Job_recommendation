@@ -45,7 +45,7 @@ def userCF_IIF_Recommend(user,train,W,JOB_OFFER):
 	return rank
 
 #userCF-IIF推荐结果
-def userCF_IIF_finallyRecommend(train,JWINFO,JOB_OFFER,R_Num=10):
+def userCF_IIF_finallyRecommend(train,JWINFO,JOB_OFFER,R_Num=10,K=1000):
 	finallyRecommend={}
 	#建立职位到求职者的倒序表及求职者喜欢的职位数
 	item_users=dict()
@@ -57,7 +57,7 @@ def userCF_IIF_finallyRecommend(train,JWINFO,JOB_OFFER,R_Num=10):
 				item_users[i]=set()
 			item_users[i].add(u)
 
-	K=1000 #分批推荐
+	K=int(K) #分批推荐
 	iter_n=int( (len(train.keys())+K-1)/K ) #循环次数
 	for j in xrange(iter_n):
 		goal_users=train.keys()[K*j:K*(j+1)]

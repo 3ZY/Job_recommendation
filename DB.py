@@ -2,12 +2,15 @@
 # -*- coding:utf-8 -*-
 #数据库操作
 import pymssql
+import ConfigParser
 
-host='127.0.0.1'
-port='1433'
-user='sa'
-password='1122334455'
-database='AnalysisData'
+conf = ConfigParser.ConfigParser()
+conf.read("conf.ini")
+host = conf.get('db','host')
+port = conf.get('db','port')
+user = conf.get('db','user')
+password = conf.get('db','password')
+database = conf.get('db','database')
 
 def DBQuery(sql):
 

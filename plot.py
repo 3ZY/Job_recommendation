@@ -22,9 +22,9 @@ def job_match(JWINFO,JOB_OFFER):
 #绘制图表
 def show_plot(fileName,R_Num=10):
     inPath="result/"
-    nowtime,lastime=getTimes(30)
-    nowtime='2016-7-28'
-    lastime='2016-6-1'
+    nowtime,lastime=getTimes(31)
+    # nowtime='2016-7-28'
+    # lastime='2016-6-1'
     JWINFOS,JOB_OFFERS=getJWJOBINFO(nowtime,lastime)
     total_rec=0#总推荐数
     total_1=0 #job_match =1

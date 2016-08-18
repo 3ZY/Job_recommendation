@@ -29,7 +29,7 @@ def getJWINFO():
 	sql="SELECT [IName]\
       ,[ICode]\
       ,[lx]\
-  FROM [AnalysisData].[dbo].[List_Down]"
+  FROM [dbo].[List_Down]"
 	result=DBQuery(sql)
 	for data in result:
 		lx_ICode_IName.setdefault(data[2],{})
@@ -38,14 +38,14 @@ def getJWINFO():
 	Jobtype={}
 	sql="SELECT [name] \
 	,[uid]\
- FROM [AnalysisData].[dbo].[Jobtype]"
+ FROM [dbo].[Jobtype]"
  	result=DBQuery(sql)
 	for data in result:
 		Jobtype.setdefault(data[1],data[0])
 
 	RESUME=dict()
 	sql="SELECT * \
-  FROM [AnalysisData].[dbo].[RESUME]"
+  FROM [dbo].[RESUME]"
 	result=DBQuery(sql)
 	for data in result:
 		RESUME[data[15]]={}
@@ -66,7 +66,7 @@ def getJWINFO():
 
 	JWINFO=dict()
 	sql="SELECT * \
-	FROM [AnalysisData].[dbo].[JWINFO]"
+	FROM [dbo].[JWINFO]"
 	result=DBQuery(sql)
 	for data in result:
 		JWINFO[data[0]]={}
@@ -152,7 +152,7 @@ def getJOBINFO():
 	sql="SELECT [IName]\
       ,[ICode]\
       ,[lx]\
-  FROM [AnalysisData].[dbo].[List_Down]"
+  FROM [dbo].[List_Down]"
 	result=DBQuery(sql)
 	for data in result:
 		lx_ICode_IName.setdefault(data[2],{})
@@ -161,7 +161,7 @@ def getJOBINFO():
 	Jobtype={}
 	sql="SELECT [name] \
 	,[uid]\
- FROM [AnalysisData].[dbo].[Jobtype]"
+ FROM [dbo].[Jobtype]"
  	result=DBQuery(sql)
 	for data in result:
 		Jobtype.setdefault(data[1],data[0])
@@ -171,14 +171,14 @@ def getJOBINFO():
 	  ,[Ent_Name] \
       ,[Ent_Industry] \
       ,[Ent_Property] \
-	FROM [AnalysisData].[dbo].[ENT_INFO_FORM]"
+	FROM [dbo].[ENT_INFO_FORM]"
 	result=DBQuery(sql)
 	for data in result:
 		ENT_INFO[data[0]]=[data[1],data[2],data[3]]
 
 	JOBINFO=dict()
 	sql="SELECT * \
-	FROM [AnalysisData].[dbo].[JOB_OFFER]"
+	FROM [dbo].[JOB_OFFER]"
 	result=DBQuery(sql)
 	for data in result:
 		JOBINFO[data[0]]={}
