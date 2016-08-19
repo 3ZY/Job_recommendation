@@ -4,6 +4,7 @@
 from __future__ import division
 from DB import *
 from datetime import date
+from random import uniform
 import operator
 
 #输出推荐结果到文件
@@ -42,6 +43,8 @@ def outToDB(recommend):
 	for u,u_recommend in recommend.items():
 		if u_recommend!={}:
 			num+=1
+			for item in u_recommend.keys():
+				u_recommend[item]+=uniform(-0.001,0.001)
 			ifPush=0
 			if sum([p for i,p in sorted(u_recommend.items(),key=operator.itemgetter(1),reverse=True)[:6] ] )>=0.012:
 				ifPush=1#推送
