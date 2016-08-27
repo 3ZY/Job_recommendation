@@ -10,6 +10,7 @@ from outData import *
 import math
 import operator
 import time
+from random import uniform
 import traceback
 import ConfigParser
 
@@ -27,8 +28,8 @@ if __name__ == '__main__':
 	try:
 		start = time.clock()
 		nowtime,lastime=getTimes( int(conf.get('base','days')) )#前n天
-		nowtime='2016-7-28'
-		lastime='2016-6-1'
+		# nowtime='2016-7-28'
+		# lastime='2016-6-1'
 		R_Num=int(conf.get('base','R_Num')) #推荐职位数
 		#获取数据
 		Job_Rec=getJob_Rec()
@@ -70,15 +71,22 @@ if __name__ == '__main__':
 		outStr['CB_fill']=u"耗时: %f s" % (CB_fill_time - most_popular_time)
 		print u"CB_fill耗时: %f s" % (CB_fill_time - most_popular_time)
 
+		#对推荐结果权重增加随机因子
+		if conf.get('base','rank')=="y":
+			for u,u_recommend in finallyRecommend.items():
+				for item in u_recommend.keys():
+					u_recommend[item]+=uniform(-0.001,0.001)
+
 		if conf.get('base','outToFile')=="y":
 			#结果输出到文件
 			outToFile('finallyRecommend.csv',finallyRecommend)
 
+		tmp_time=time.clock()
 		#结果输出到数据库
 		outToDB(finallyRecommend)
 		outToDB_time=time.clock()
-		outStr['outToDB']=u"耗时: %f s" % (outToDB_time - CB_fill_time)
-		print u"outToDB耗时: %f s" % (outToDB_time - CB_fill_time)
+		outStr['outToDB']=u"耗时: %f s" % (outToDB_time - tmp_time)
+		print u"outToDB耗时: %f s" % (outToDB_time - tmp_time)
 
 		end = time.clock()
 		outStr['total']=u"耗时: %f s" % (end - start)
